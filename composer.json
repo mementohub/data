@@ -14,5 +14,7 @@
             "email": "bogdan.cismariu@gmail.com"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "phpunit/phpunit": "^12.4"
+    }
 }
