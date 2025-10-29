@@ -2,25 +2,53 @@
 
 namespace Mementohub\Data\Entities;
 
+use Mementohub\Data\Values\Optional;
 use ReflectionClass;
 
+/**
+ * @mixin ReflectionClass;
+ */
 class DataClass
 {
+    public readonly string $name;
+
+    public readonly array $defaults;
+
+    public readonly array $known_properties;
+
     protected ReflectionClass $class;
 
     /** @var DataProperty[] */
     protected array $properties = [];
 
     public function __construct(
-        string $class,
+        string $class_name,
     ) {
-        $this->class = new ReflectionClass($class);
+        $this->class = new ReflectionClass($class_name);
+        $this->name = $this->class->getName();
         $this->setProperties();
+        $this->known_properties = $this->getPropertyKeys();
+        $this->defaults = $this->computeDefaultValues();
     }
 
-    public function getName(): string
+    public function buildFrom(array $data): mixed
     {
-        return $this->class->getName();
+        return new $this->name(...$this->acceptableParameters($data));
+    }
+
+    public function buildFromWithDefaults(array $data): mixed
+    {
+        return new $this->name(...$this->acceptableParametersWithDefaults($data));
+    }
+
+    public function acceptableParameters(array $data): array
+    {
+        return array_intersect_key($data, $this->known_properties);
+    }
+
+    public function acceptableParametersWithDefaults(array $data): array
+    {
+        return array_merge($this->defaults, array_intersect_key($data, $this->known_properties));
     }
 
     public function getProperties(): array
@@ -38,9 +66,31 @@ class DataClass
         return $properties;
     }
 
+    protected function computeDefaultValues(): array
+    {
+        $defaults = [];
+        foreach ($this->properties as $name => $property) {
+            if ($property->hasDefaultValue()) {
+                continue;
+            }
+
+            if ($property->allowsNull()) {
+                $defaults[$name] = null;
+
+                continue;
+            }
+
+            if ($property->allowsOptional()) {
+                $defaults[$name] = Optional::create();
+            }
+        }
+
+        return $defaults;
+    }
+
     public function getNullableProperties(): array
     {
-        return array_filter($this->properties, fn (DataProperty $property) => $property->isNullable());
+        return array_filter($this->properties, fn (DataProperty $property) => $property->allowsNull());
     }
 
     /**
@@ -56,7 +106,7 @@ class DataClass
                 continue;
             }
 
-            if ($property->isNullable()) {
+            if ($property->allowsNull()) {
                 $properties[$property->getName()] = null;
             }
         }
@@ -84,5 +134,10 @@ class DataClass
         foreach ($this->class->getConstructor()->getParameters() as $property) {
             $this->properties[$property->getName()] = new DataProperty($property);
         }
+    }
+
+    public function __call($name, $arguments)
+    {
+        return $this->class->$name(...$arguments);
     }
 }

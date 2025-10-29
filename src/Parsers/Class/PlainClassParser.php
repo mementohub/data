@@ -7,16 +7,9 @@ use Mementohub\Data\Parsers\Contracts\ClassParser;
 
 class PlainClassParser implements ClassParser
 {
-    protected array $known_properties = [];
-
-    protected string $className;
-
     public function __construct(
         public readonly DataClass $class
-    ) {
-        $this->className = $class->getName();
-        $this->known_properties = $class->getPropertyKeys();
-    }
+    ) {}
 
     public function parse(mixed $data): mixed
     {
@@ -24,6 +17,6 @@ class PlainClassParser implements ClassParser
             return $data;
         }
 
-        return new $this->className(...array_intersect_key($data, $this->known_properties));
+        return $this->class->buildFrom($data);
     }
 }

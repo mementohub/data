@@ -35,4 +35,21 @@ class DataType
 
         throw new RuntimeException('Unable to find main type');
     }
+
+    public function allows(string $type): bool
+    {
+        if ($this->type instanceof ReflectionNamedType) {
+            return $this->type->getName() === $type;
+        }
+
+        if ($this->type instanceof ReflectionUnionType) {
+            foreach ($this->type->getTypes() as $type) {
+                if ($type->getName() === $type) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

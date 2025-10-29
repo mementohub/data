@@ -10,19 +10,9 @@ use Mementohub\Data\Parsers\Contracts\ClassParser;
  */
 class PlainClassWithDefaultsParser implements ClassParser
 {
-    protected string $className;
-
-    protected array $nullable = [];
-
-    protected array $known_properties = [];
-
     public function __construct(
         public readonly DataClass $class
-    ) {
-        $this->className = $class->getName();
-        $this->nullable = $this->class->getNullDefaultableProperties();
-        $this->known_properties = $class->getPropertyKeys();
-    }
+    ) {}
 
     public function parse(mixed $data): mixed
     {
@@ -30,6 +20,6 @@ class PlainClassWithDefaultsParser implements ClassParser
             return $data;
         }
 
-        return new $this->className(...array_merge($this->nullable, array_intersect_key($data, $this->known_properties)));
+        return $this->class->buildFromWithDefaults($data);
     }
 }

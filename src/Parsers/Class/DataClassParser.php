@@ -8,17 +8,11 @@ use Mementohub\Data\Parsers\Factories\PropertyParserFactory;
 
 class DataClassParser implements ClassParser
 {
-    protected array $known_properties = [];
-
-    protected string $className;
-
     protected array $property_processors = [];
 
     public function __construct(
         public readonly DataClass $class
     ) {
-        $this->className = $class->getName();
-        $this->known_properties = $class->getPropertyKeys();
         $this->setPropertyProcesors();
     }
 
@@ -32,7 +26,7 @@ class DataClassParser implements ClassParser
             $data[$property] = $processor->parse($data[$property], $data);
         }
 
-        return new $this->className(...array_intersect_key($data, $this->known_properties));
+        return $this->class->buildFrom($data);
     }
 
     protected function setPropertyProcesors()

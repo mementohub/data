@@ -2,17 +2,21 @@
 
 namespace Mementohub\Data\Entities;
 
+use Mementohub\Data\Values\Optional;
 use ReflectionParameter;
 
+/**
+ * @mixin ReflectionParameter
+ */
 class DataProperty
 {
     public function __construct(
         protected readonly ReflectionParameter $property
     ) {}
 
-    public function isNullable(): bool
+    public function allowsOptional(): bool
     {
-        return $this->property->allowsNull();
+        return $this->getType()->allows(Optional::class);
     }
 
     public function hasDefaultValue(): bool
@@ -20,18 +24,13 @@ class DataProperty
         return $this->property->isDefaultValueAvailable();
     }
 
-    public function getDefaultValue(): mixed
-    {
-        return $this->property->getDefaultValue();
-    }
-
-    public function getName(): string
-    {
-        return $this->property->getName();
-    }
-
     public function getType(): DataType
     {
         return new DataType($this->property->getType());
+    }
+
+    public function __call($name, $arguments)
+    {
+        return $this->property->$name(...$arguments);
     }
 }
