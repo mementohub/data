@@ -1,0 +1,18 @@
+{
+    "name": "mementohub/data",
+    "description": "Map arrays into Data Transfer Objects",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mementohub\\Data\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bogdan Cismariu",
+            "email": "bogdan.cismariu@gmail.com"
+        }
+    ],
+    "require": {}
+}
