@@ -8,6 +8,11 @@
             "Mementohub\\Data\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Mementohub\\Data\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Bogdan Cismariu",

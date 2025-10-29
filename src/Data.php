@@ -2,7 +2,12 @@
 
 namespace Mementohub\Data;
 
+use Mementohub\Data\Parsers\Factories\ClassParserFactory;
+
 abstract class Data
 {
-    public function from(array $payload): static {}
+    public static function from(array $payload): static
+    {
+        return ClassParserFactory::for(static::class)->parse($payload);
+    }
 }
