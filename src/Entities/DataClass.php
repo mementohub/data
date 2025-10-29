@@ -51,6 +51,7 @@ class DataClass
         return array_merge($this->defaults, array_intersect_key($data, $this->known_properties));
     }
 
+    /** @return DataProperty[] */
     public function getProperties(): array
     {
         return $this->properties;

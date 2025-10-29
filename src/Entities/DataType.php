@@ -7,6 +7,9 @@ use ReflectionType;
 use ReflectionUnionType;
 use RuntimeException;
 
+/**
+ * @mixin ReflectionType
+ */
 class DataType
 {
     public function __construct(
@@ -39,7 +42,7 @@ class DataType
     public function allows(string $type): bool
     {
         if ($this->type instanceof ReflectionNamedType) {
-            return $this->type->getName() === $type;
+            return $this->getName() === $type;
         }
 
         if ($this->type instanceof ReflectionUnionType) {
@@ -51,5 +54,10 @@ class DataType
         }
 
         return false;
+    }
+
+    public function __call($name, $arguments)
+    {
+        return $this->type->$name(...$arguments);
     }
 }
