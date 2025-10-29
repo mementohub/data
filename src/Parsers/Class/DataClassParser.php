@@ -22,16 +22,20 @@ class DataClassParser implements ClassParser
             return $data;
         }
 
-        foreach ($this->property_processors as $property => $processor) {
+        foreach (array_intersect_key($this->property_processors, $data) as $property => $processor) {
             $data[$property] = $processor->parse($data[$property], $data);
         }
 
-        return $this->class->buildFrom($data);
+        return $this->class->buildFromWithDefaults($data);
     }
 
     protected function setPropertyProcesors()
     {
         foreach ($this->class->getProperties() as $property) {
+            if (! $property->needsParsing()) {
+                continue;
+            }
+
             $this->property_processors[$property->getName()] = PropertyParserFactory::for($property);
         }
     }

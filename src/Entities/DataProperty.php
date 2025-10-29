@@ -24,6 +24,11 @@ class DataProperty
         return $this->property->isDefaultValueAvailable();
     }
 
+    public function needsParsing(): bool
+    {
+        return ! $this->getType()->isBuiltin();
+    }
+
     public function getType(): DataType
     {
         return new DataType($this->property->getType());
