@@ -10,4 +10,9 @@ abstract class Data
     {
         return ClassParserFactory::for(static::class)->parse($payload);
     }
+
+    public static function normalizers(): array
+    {
+        return [];
+    }
 }

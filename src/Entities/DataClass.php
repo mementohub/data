@@ -51,6 +51,11 @@ class DataClass
         return array_merge($this->defaults, array_intersect_key($data, $this->known_properties));
     }
 
+    public function needsNormalizing(): bool
+    {
+        return count($this->class->name::normalizers()) > 0;
+    }
+
     /** @return DataProperty[] */
     public function getProperties(): array
     {
