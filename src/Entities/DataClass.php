@@ -149,7 +149,10 @@ class DataClass
 
     protected function setProperties()
     {
-        foreach ($this->class->getConstructor()->getParameters() as $property) {
+        foreach ($this->class->getProperties() as $property) {
+            if (! $property->isPromoted()) {
+                continue;
+            }
             $this->properties[$property->getName()] = new DataProperty($property);
         }
     }

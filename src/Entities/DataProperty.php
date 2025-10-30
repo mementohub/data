@@ -3,15 +3,15 @@
 namespace Mementohub\Data\Entities;
 
 use Mementohub\Data\Values\Optional;
-use ReflectionParameter;
+use ReflectionProperty;
 
 /**
- * @mixin ReflectionParameter
+ * @mixin ReflectionProperty
  */
 class DataProperty
 {
     public function __construct(
-        protected readonly ReflectionParameter $property
+        protected readonly ReflectionProperty $property
     ) {}
 
     public function allowsOptional(): bool
@@ -19,9 +19,9 @@ class DataProperty
         return $this->getType()->allows(Optional::class);
     }
 
-    public function hasDefaultValue(): bool
+    public function allowsNull(): bool
     {
-        return $this->property->isDefaultValueAvailable();
+        return $this->getType()->allowsNull();
     }
 
     public function needsParsing(): bool
