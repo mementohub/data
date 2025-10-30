@@ -2,6 +2,7 @@
 
 namespace Mementohub\Data\Entities;
 
+use Mementohub\Data\Attributes\MapInputName;
 use Mementohub\Data\Values\Optional;
 use ReflectionClass;
 
@@ -54,6 +55,17 @@ class DataClass
     public function needsNormalizing(): bool
     {
         return count($this->class->name::normalizers()) > 0;
+    }
+
+    public function needsInputMapping(): bool
+    {
+        foreach ($this->class->getProperties() as $property) {
+            if ($property->getAttributes(MapInputName::class)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** @return DataProperty[] */

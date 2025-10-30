@@ -4,6 +4,7 @@ namespace Mementohub\Data\Parsers\Factories;
 
 use Mementohub\Data\Entities\DataClass;
 use Mementohub\Data\Parsers\Class\DataClassParser;
+use Mementohub\Data\Parsers\Class\InputMappingClassParser;
 use Mementohub\Data\Parsers\Class\NormalizerClassParser;
 use Mementohub\Data\Parsers\Class\PlainClassParser;
 use Mementohub\Data\Parsers\Class\PlainClassWithDefaultsParser;
@@ -22,6 +23,16 @@ class ClassParserResolver
     {
         if ($this->class->needsNormalizing()) {
             return new NormalizerClassParser($this->class)
+                ->then($this->resolveInputMapper());
+        }
+
+        return $this->resolveInputMapper();
+    }
+
+    protected function resolveInputMapper(): ClassParser
+    {
+        if ($this->class->needsInputMapping()) {
+            return new InputMappingClassParser($this->class)
                 ->then($this->resolveClassParser());
         }
 
