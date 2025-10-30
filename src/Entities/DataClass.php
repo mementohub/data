@@ -3,6 +3,7 @@
 namespace Mementohub\Data\Entities;
 
 use Mementohub\Data\Attributes\MapInputName;
+use Mementohub\Data\Data;
 use Mementohub\Data\Values\Optional;
 use ReflectionClass;
 
@@ -54,6 +55,10 @@ class DataClass
 
     public function needsNormalizing(): bool
     {
+        if (! is_a($this->class->name, Data::class, true)) {
+            return false;
+        }
+
         return count($this->class->name::normalizers()) > 0;
     }
 

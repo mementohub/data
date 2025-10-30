@@ -41,6 +41,7 @@ class ClassParserResolver
 
     public function resolveClassParser(): ClassParser
     {
+        return new DataClassParser($this->class);
         if ($this->class->isPlainClass()) {
             return $this->resolvePlainClass();
         }

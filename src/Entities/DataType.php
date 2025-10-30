@@ -22,6 +22,27 @@ class DataType
             && $this->type->isBuiltin();
     }
 
+    public function firstOf(string $abstract): ?string
+    {
+        foreach ($this->getTypes() as $type) {
+            if (is_a($type->getName(), $abstract, true)) {
+                return $type->getName();
+            }
+        }
+
+        return null;
+    }
+
+    /** @return ReflectionNamedType[] */
+    public function getTypes(): array
+    {
+        if ($this->type instanceof ReflectionUnionType) {
+            return $this->type->getTypes();
+        }
+
+        return [$this->type];
+    }
+
     public function getMainType(): string
     {
         if ($this->type instanceof ReflectionNamedType) {

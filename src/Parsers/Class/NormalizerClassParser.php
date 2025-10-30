@@ -18,7 +18,7 @@ class NormalizerClassParser implements ClassParser
     public function __construct(
         public readonly DataClass $class
     ) {
-        $this->normalizers = $this->class->name::normalizers();
+        $this->normalizers = $this->resolveNormalizers();
     }
 
     public function parse(mixed $data): mixed
@@ -50,5 +50,22 @@ class NormalizerClassParser implements ClassParser
         }
 
         return null;
+    }
+
+    protected function resolveNormalizers(): array
+    {
+        $normalizers = [];
+
+        foreach ($this->class->name::normalizers() as $normalizer) {
+            if (is_string($normalizer) && class_exists($normalizer)) {
+                $normalizer = new $normalizer;
+            }
+
+            if (is_a($normalizer, Normalizer::class, true)) {
+                $normalizers[] = $normalizer;
+            }
+        }
+
+        return $normalizers;
     }
 }

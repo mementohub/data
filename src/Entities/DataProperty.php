@@ -2,7 +2,10 @@
 
 namespace Mementohub\Data\Entities;
 
+use Mementohub\Data\Attributes\CastUsing;
+use Mementohub\Data\Attributes\CollectionOf;
 use Mementohub\Data\Values\Optional;
+use ReflectionAttribute;
 use ReflectionProperty;
 
 /**
@@ -26,7 +29,27 @@ class DataProperty
 
     public function needsParsing(): bool
     {
+        if ($this->isCastable()) {
+            return true;
+        }
+
         return ! $this->getType()->isBuiltin();
+    }
+
+    public function getCastableAttributes(): array
+    {
+        return array_filter(
+            $this->property->getAttributes(),
+            fn (ReflectionAttribute $attribute) => in_array($attribute->getName(), [
+                CastUsing::class,
+                CollectionOf::class,
+            ])
+        );
+    }
+
+    protected function isCastable(): bool
+    {
+        return count($this->getCastableAttributes()) > 0;
     }
 
     public function getType(): DataType
