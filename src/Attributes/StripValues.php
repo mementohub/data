@@ -13,7 +13,7 @@ class StripValues
         mixed ...$arguments
     ) {
         if (count($arguments) === 0) {
-            $arguments = [null];
+            $arguments = [null, ''];
         }
 
         $this->arguments = $arguments;
