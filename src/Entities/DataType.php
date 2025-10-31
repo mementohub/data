@@ -25,8 +25,12 @@ class DataType
     public function firstOf(string $abstract): ?string
     {
         foreach ($this->getTypes() as $type) {
-            if (is_a($type->getName(), $abstract, true)) {
-                return $type->getName();
+            $name = $type->getName();
+            if ($name === $abstract) {
+                return $name;
+            }
+            if (is_a($name, $abstract, true)) {
+                return $name;
             }
         }
 

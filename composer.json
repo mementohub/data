@@ -24,6 +24,7 @@
         "spatie/ray": "^1.43"
     },
     "require": {
-        "illuminate/collections": "^12.36"
+        "illuminate/collections": "^12.36",
+        "phpdocumentor/reflection-docblock": "^5.6"
     }
 }

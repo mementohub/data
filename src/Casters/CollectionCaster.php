@@ -2,30 +2,52 @@
 
 namespace Mementohub\Data\Casters;
 
-use Illuminate\Support\Collection;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Entities\DataProperty;
 use Mementohub\Data\Parsers\Contracts\ClassParser;
 use Mementohub\Data\Parsers\Factories\ClassParserFactory;
+use Traversable;
 
 class CollectionCaster implements Caster
 {
     protected readonly ClassParser $parser;
 
+    protected readonly ?string $type;
+
     public function __construct(
         protected readonly DataProperty $property,
-        protected readonly string $class
+        protected readonly ?string $class
     ) {
-        $this->parser = ClassParserFactory::for($class);
+        if ($class) {
+            $this->parser = ClassParserFactory::for($class);
+        }
+
+        $this->type = $this->property->getType()->firstOf(Traversable::class);
     }
 
     public function cast(mixed $value, array $context): mixed
     {
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        if (! isset($this->parser)) {
+            if (is_null($this->type)) {
+                return $value;
+            }
+
+            return new $this->type($value);
+        }
+
         $collection = [];
         foreach ($value as $key => $item) {
             $collection[$key] = $this->parser->parse($item);
         }
 
-        return new Collection($collection);
+        if (is_null($this->type)) {
+            return $collection;
+        }
+
+        return new $this->type($collection);
     }
 }

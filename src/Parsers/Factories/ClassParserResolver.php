@@ -4,6 +4,7 @@ namespace Mementohub\Data\Parsers\Factories;
 
 use Mementohub\Data\Entities\DataClass;
 use Mementohub\Data\Parsers\Class\DataClassParser;
+use Mementohub\Data\Parsers\Class\EnumClassParser;
 use Mementohub\Data\Parsers\Class\InputMappingClassParser;
 use Mementohub\Data\Parsers\Class\NormalizerClassParser;
 use Mementohub\Data\Parsers\Class\PlainClassParser;
@@ -41,6 +42,10 @@ class ClassParserResolver
 
     public function resolveClassParser(): ClassParser
     {
+        if ($this->class->isEnum()) {
+            return new EnumClassParser($this->class);
+        }
+
         return new DataClassParser($this->class);
         if ($this->class->isPlainClass()) {
             return $this->resolvePlainClass();
