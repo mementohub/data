@@ -15,7 +15,7 @@ class DateTimeCaster implements Caster
     public function __construct(
         protected readonly DataProperty $property,
         protected readonly ?string $format = null,
-        protected readonly bool $cacheable = false
+        protected readonly bool $cacheable = true
     ) {
         $this->type = $this->property->getType()->getName();
     }

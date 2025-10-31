@@ -9,6 +9,7 @@ use Mementohub\Data\Parsers\Class\InputMappingClassParser;
 use Mementohub\Data\Parsers\Class\NormalizerClassParser;
 use Mementohub\Data\Parsers\Class\PlainClassParser;
 use Mementohub\Data\Parsers\Class\PlainClassWithDefaultsParser;
+use Mementohub\Data\Parsers\Class\StrippingValuesClassParser;
 use Mementohub\Data\Parsers\Contracts\ClassParser;
 
 class ClassParserResolver
@@ -34,6 +35,16 @@ class ClassParserResolver
     {
         if ($this->class->needsInputMapping()) {
             return new InputMappingClassParser($this->class)
+                ->then($this->resolveStrippingValues());
+        }
+
+        return $this->resolveStrippingValues();
+    }
+
+    protected function resolveStrippingValues(): ClassParser
+    {
+        if ($this->class->needsStripping()) {
+            return new StrippingValuesClassParser($this->class)
                 ->then($this->resolveClassParser());
         }
 

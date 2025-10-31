@@ -3,6 +3,7 @@
 namespace Mementohub\Data\Entities;
 
 use Mementohub\Data\Attributes\MapInputName;
+use Mementohub\Data\Attributes\StripValues;
 use Mementohub\Data\Data;
 use Mementohub\Data\Values\Optional;
 use ReflectionClass;
@@ -64,8 +65,18 @@ class DataClass
 
     public function needsInputMapping(): bool
     {
+        return $this->hasAttribute(MapInputName::class);
+    }
+
+    public function needsStripping(): bool
+    {
+        return $this->hasAttribute(StripValues::class);
+    }
+
+    protected function hasAttribute(string $name): bool
+    {
         foreach ($this->class->getProperties() as $property) {
-            if ($property->getAttributes(MapInputName::class)) {
+            if ($property->getAttributes($name)) {
                 return true;
             }
         }
@@ -91,9 +102,16 @@ class DataClass
 
     protected function computeDefaultValues(): array
     {
+        $defined = [];
+        foreach ($this->class->getConstructor()?->getParameters() ?? [] as $parameter) {
+            if ($parameter->isDefaultValueAvailable()) {
+                $defined[] = $parameter->getName();
+            }
+        }
+
         $defaults = [];
         foreach ($this->properties as $name => $property) {
-            if ($property->hasDefaultValue()) {
+            if ($property->hasDefaultValue() || in_array($property->getName(), $defined)) {
                 continue;
             }
 
@@ -107,6 +125,8 @@ class DataClass
                 $defaults[$name] = Optional::create();
             }
         }
+
+        ray($defaults);
 
         return $defaults;
     }
