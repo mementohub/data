@@ -126,8 +126,6 @@ class DataClass
             }
         }
 
-        ray($defaults);
-
         return $defaults;
     }
 
