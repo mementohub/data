@@ -2,10 +2,10 @@
 
 namespace Mementohub\Data\Casters;
 
+use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Entities\DataProperty;
-use Mementohub\Data\Parsers\Contracts\PropertyParser;
 
-class EnumCaster implements PropertyParser
+class EnumCaster implements Caster
 {
     protected array $cached = [];
 
@@ -14,7 +14,7 @@ class EnumCaster implements PropertyParser
         protected readonly string $class,
     ) {}
 
-    public function parse(mixed $value, array $context): mixed
+    public function handle(mixed $value, array $context): mixed
     {
         if (isset($this->cached[$value])) {
             return $this->cached[$value];

@@ -2,7 +2,4 @@
 
 namespace Mementohub\Data\Contracts;
 
-interface Normalizer
-{
-    public function normalize(mixed $value): ?array;
-}
+interface Normalizer extends Parser {}

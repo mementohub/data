@@ -3,10 +3,10 @@
 namespace Mementohub\Data\Casters;
 
 use DateTimeInterface;
+use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Entities\DataProperty;
-use Mementohub\Data\Parsers\Contracts\PropertyParser;
 
-class DateTimeCaster implements PropertyParser
+class DateTimeCaster implements Caster
 {
     protected static array $cached = [];
 
@@ -20,7 +20,7 @@ class DateTimeCaster implements PropertyParser
         $this->type = $this->property->getType()->getName();
     }
 
-    public function parse(mixed $value, array $context): ?DateTimeInterface
+    public function handle(mixed $value, array $context): ?DateTimeInterface
     {
         if ($value instanceof DateTimeInterface) {
             return $value;

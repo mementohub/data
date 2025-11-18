@@ -12,7 +12,7 @@ class AgeCaster implements Caster
         protected readonly int $increment = 3,
     ) {}
 
-    public function cast(mixed $value, array $context): mixed
+    public function handle(mixed $value, array $context): mixed
     {
         return $value + $this->increment;
     }

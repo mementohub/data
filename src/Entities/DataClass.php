@@ -73,7 +73,7 @@ class DataClass
         return $this->hasAttribute(StripValues::class);
     }
 
-    protected function hasAttribute(string $name): bool
+    public function hasAttribute(string $name): bool
     {
         foreach ($this->class->getProperties() as $property) {
             if ($property->getAttributes($name)) {
@@ -168,6 +168,11 @@ class DataClass
         }
 
         return true;
+    }
+
+    public function isDataClass(): bool
+    {
+        return $this->class->isSubclassOf(Data::class);
     }
 
     protected function setProperties()

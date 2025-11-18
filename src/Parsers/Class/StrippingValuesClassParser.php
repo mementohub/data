@@ -4,13 +4,11 @@ namespace Mementohub\Data\Parsers\Class;
 
 use Exception;
 use Mementohub\Data\Attributes\StripValues;
+use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
-use Mementohub\Data\Parsers\Contracts\ClassParser;
 
-class StrippingValuesClassParser implements ClassParser
+class StrippingValuesClassParser implements Parser
 {
-    protected ClassParser $next;
-
     protected readonly array $strippers;
 
     public function __construct(
@@ -19,26 +17,17 @@ class StrippingValuesClassParser implements ClassParser
         $this->strippers = $this->resolveStrippers();
     }
 
-    public function parse(mixed $data): mixed
+    public function handle(mixed $data): mixed
     {
         if (! is_array($data)) {
             return $data;
         }
 
         try {
-            return $this->next->parse(
-                $this->stripInput($data)
-            );
+            return $this->stripInput($data);
         } catch (Exception $e) {
             throw new Exception('Unable to strip input data', $e->getCode(), $e);
         }
-    }
-
-    public function then(ClassParser $next): ClassParser
-    {
-        $this->next = $next;
-
-        return $this;
     }
 
     protected function stripInput(array $data): array
@@ -54,7 +43,6 @@ class StrippingValuesClassParser implements ClassParser
 
     protected function resolveStrippers(): array
     {
-
         foreach ($this->class->getProperties() as $property) {
             $attributes = $property->getAttributes(StripValues::class);
             if (count($attributes) === 0) {

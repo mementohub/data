@@ -6,7 +6,7 @@ use Mementohub\Data\Contracts\Normalizer;
 
 class AgeNormalizer implements Normalizer
 {
-    public function normalize(mixed $value): ?array
+    public function handle(mixed $value): ?array
     {
         if (! is_array($value)) {
             return null;

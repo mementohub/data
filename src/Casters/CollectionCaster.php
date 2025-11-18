@@ -2,15 +2,16 @@
 
 namespace Mementohub\Data\Casters;
 
+use Mementohub\Data\Contracts\Caster;
+use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataProperty;
-use Mementohub\Data\Parsers\Contracts\ClassParser;
-use Mementohub\Data\Parsers\Contracts\PropertyParser;
-use Mementohub\Data\Parsers\Factories\ClassParserFactory;
+use Mementohub\Data\Factories\Parsers;
 use Traversable;
 
-class CollectionCaster implements PropertyParser
+class CollectionCaster implements Caster
 {
-    protected readonly ClassParser $parser;
+    /** @var Parser[] */
+    protected readonly array $parsers;
 
     protected readonly ?string $type;
 
@@ -19,19 +20,21 @@ class CollectionCaster implements PropertyParser
         protected readonly ?string $class
     ) {
         if ($class) {
-            $this->parser = ClassParserFactory::for($class);
+            $this->parsers = Parsers::for($class);
+        } else {
+            $this->parsers = [];
         }
 
         $this->type = $this->property->getType()->firstOf(Traversable::class);
     }
 
-    public function parse(mixed $value, array $context): mixed
+    public function handle(mixed $value, array $context): mixed
     {
         if (! is_array($value)) {
             return $value;
         }
 
-        if (! isset($this->parser)) {
+        if (count($this->parsers) == 0) {
             if (is_null($this->type)) {
                 return $value;
             }
@@ -41,7 +44,10 @@ class CollectionCaster implements PropertyParser
 
         $collection = [];
         foreach ($value as $key => $item) {
-            $collection[$key] = $this->parser->parse($item);
+            foreach ($this->parsers as $parser) {
+                $item = $parser->handle($item, $context);
+            }
+            $collection[$key] = $item;
         }
 
         if (is_null($this->type)) {

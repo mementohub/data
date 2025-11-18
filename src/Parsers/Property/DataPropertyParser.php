@@ -2,23 +2,27 @@
 
 namespace Mementohub\Data\Parsers\Property;
 
+use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Entities\DataProperty;
-use Mementohub\Data\Parsers\Contracts\ClassParser;
-use Mementohub\Data\Parsers\Contracts\PropertyParser;
-use Mementohub\Data\Parsers\Factories\ClassParserFactory;
+use Mementohub\Data\Factories\Parsers;
 
-class DataPropertyParser implements PropertyParser
+class DataPropertyParser implements Caster
 {
-    protected readonly ClassParser $class_parser;
+    /** @var Parser[] */
+    protected readonly array $parsers;
 
     public function __construct(
         public readonly DataProperty $property
     ) {
-        $this->class_parser = ClassParserFactory::for($property->getType()->getMainType());
+        $this->parsers = Parsers::for($property->getType()->getMainType());
     }
 
-    public function parse(mixed $value, array $context): mixed
+    public function handle(mixed $value, array $context): mixed
     {
-        return $this->class_parser->parse($value);
+        foreach ($this->parsers as $parser) {
+            $value = $parser->handle($value, $context);
+        }
+
+        return $value;
     }
 }

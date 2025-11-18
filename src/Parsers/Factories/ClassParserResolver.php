@@ -10,7 +10,6 @@ use Mementohub\Data\Parsers\Class\NormalizerClassParser;
 use Mementohub\Data\Parsers\Class\PlainClassParser;
 use Mementohub\Data\Parsers\Class\PlainClassWithDefaultsParser;
 use Mementohub\Data\Parsers\Class\StrippingValuesClassParser;
-use Mementohub\Data\Parsers\Contracts\ClassParser;
 
 class ClassParserResolver
 {
@@ -21,7 +20,7 @@ class ClassParserResolver
         $this->class = new DataClass($class);
     }
 
-    public function resolve(): ClassParser
+    public function resolve(): Parser
     {
         if ($this->class->needsNormalizing()) {
             return new NormalizerClassParser($this->class)
@@ -31,7 +30,7 @@ class ClassParserResolver
         return $this->resolveInputMapper();
     }
 
-    protected function resolveInputMapper(): ClassParser
+    protected function resolveInputMapper(): Parser
     {
         if ($this->class->needsInputMapping()) {
             return new InputMappingClassParser($this->class)
@@ -41,7 +40,7 @@ class ClassParserResolver
         return $this->resolveStrippingValues();
     }
 
-    protected function resolveStrippingValues(): ClassParser
+    protected function resolveStrippingValues(): Parser
     {
         if ($this->class->needsStripping()) {
             return new StrippingValuesClassParser($this->class)
@@ -51,7 +50,7 @@ class ClassParserResolver
         return $this->resolveClassParser();
     }
 
-    public function resolveClassParser(): ClassParser
+    public function resolveClassParser(): Parser
     {
         if ($this->class->isEnum()) {
             return new EnumClassParser($this->class);
@@ -65,7 +64,7 @@ class ClassParserResolver
         return new DataClassParser($this->class);
     }
 
-    protected function resolvePlainClass(): ClassParser
+    protected function resolvePlainClass(): Parser
     {
         if (count($this->class->getNullDefaultableProperties()) > 0) {
             return new PlainClassWithDefaultsParser($this->class);

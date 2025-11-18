@@ -2,10 +2,10 @@
 
 namespace Mementohub\Data\Parsers\Class;
 
+use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
-use Mementohub\Data\Parsers\Contracts\ClassParser;
 
-class EnumClassParser implements ClassParser
+class EnumClassParser implements Parser
 {
     protected array $cached = [];
 
@@ -13,7 +13,7 @@ class EnumClassParser implements ClassParser
         public readonly DataClass $class
     ) {}
 
-    public function parse(mixed $data): mixed
+    public function handle(mixed $data): mixed
     {
         if (! is_int($data) && ! is_string($data)) {
             return $data;

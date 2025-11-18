@@ -2,57 +2,48 @@
 
 namespace Mementohub\Data\Parsers\Class;
 
+use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
-use Mementohub\Data\Parsers\Contracts\ClassParser;
-use Mementohub\Data\Parsers\Factories\PropertyParserFactory;
+use Mementohub\Data\Factories\Casters;
 
-class DataClassParser implements ClassParser
+class DataClassParser implements Parser
 {
-    protected array $property_processors = [];
+    /** @var array<string, Caster[]> */
+    protected array $casters = [];
 
     public function __construct(
         public readonly DataClass $class
     ) {
-        $this->setPropertyProcesors();
+        $this->resolveCasters();
     }
 
-    public function parse(mixed $data): mixed
+    public function handle(mixed $data): mixed
     {
         if (! is_array($data)) {
             return $data;
         }
 
         $processed = [];
-        foreach ($this->property_processors as $property => $processor) {
+        foreach ($this->casters as $property => $casters) {
             if (isset($data[$property])) {
-                if ($processor === null) {
-                    $processed[] = $data[$property];
-                } else {
-                    $value = $data[$property];
-                    foreach ([$processor] as $p) {
-                        $value = $p->parse($value, $data);
-                    }
-                    $processed[] = $value;
+                foreach ($casters as $caster) {
+                    $data[$property] = $caster->handle($data[$property], $data);
                 }
+                $processed[] = $data[$property];
             } else {
+                // if (array_key_exists($property, $this->class->defaults)) {
                 $processed[] = $this->class->defaults[$property];
+                // }
             }
-
         }
 
         return new $this->class->name(...$processed);
     }
 
-    protected function setPropertyProcesors()
+    protected function resolveCasters()
     {
         foreach ($this->class->getProperties() as $property) {
-            if (! $property->needsParsing()) {
-                $this->property_processors[$property->getName()] = null;
-
-                continue;
-            }
-
-            $this->property_processors[$property->getName()] = PropertyParserFactory::for($property);
+            $this->casters[$property->getName()] = Casters::for($property);
         }
     }
 }

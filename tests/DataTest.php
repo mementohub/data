@@ -16,6 +16,7 @@ class DataTest extends TestCase
             'email' => 'john@example.com',
             'age' => 30,
         ]);
+
         $this->assertInstanceOf(Person::class, $person);
         $this->assertEquals('John', $person->name);
         $this->assertEquals('john@example.com', $person->email);

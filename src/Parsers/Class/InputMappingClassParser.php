@@ -4,12 +4,12 @@ namespace Mementohub\Data\Parsers\Class;
 
 use Exception;
 use Mementohub\Data\Attributes\MapInputName;
+use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
-use Mementohub\Data\Parsers\Contracts\ClassParser;
 
-class InputMappingClassParser implements ClassParser
+class InputMappingClassParser implements Parser
 {
-    protected ClassParser $next;
+    protected Parser $next;
 
     protected readonly array $mappers;
 
@@ -22,26 +22,17 @@ class InputMappingClassParser implements ClassParser
         $this->has_nested_mappers = $this->detectNestedMappers();
     }
 
-    public function parse(mixed $data): mixed
+    public function handle(mixed $data): mixed
     {
         if (! is_array($data)) {
             return $data;
         }
 
         try {
-            return $this->next->parse(
-                $this->mapInput($data)
-            );
+            return $this->mapInput($data);
         } catch (Exception $e) {
             throw new Exception('Unable to map input data', $e->getCode(), $e);
         }
-    }
-
-    public function then(ClassParser $next): ClassParser
-    {
-        $this->next = $next;
-
-        return $this;
     }
 
     protected function mapInput(array $data): array
