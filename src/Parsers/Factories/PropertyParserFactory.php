@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Mementohub\Data\Casters\CollectionCaster;
 use Mementohub\Data\Casters\DateTimeCaster;
 use Mementohub\Data\Casters\EnumCaster;
-use Mementohub\Data\Contracts\Caster;
+use Mementohub\Data\Data;
 use Mementohub\Data\Entities\DataProperty;
 use Mementohub\Data\Parsers\Contracts\PropertyParser;
 use Mementohub\Data\Parsers\Property\CastablePropertyParser;
@@ -21,35 +21,62 @@ class PropertyParserFactory
         protected readonly DataProperty $property
     ) {}
 
-    public static function for(DataProperty $property): PropertyParser
+    public static function for(DataProperty $property): ?PropertyParser
     {
         return new self($property)->resolve();
     }
 
-    protected function resolve(): PropertyParser
+    protected function resolve(): ?PropertyParser
+    {
+        $caster = $this->getCaster();
+        $parser = $this->getPropertyParser();
+
+        if ($caster == null) {
+            return $parser;
+        }
+
+        if ($parser == null) {
+            return $caster;
+        }
+
+        return $caster;
+
+        return $caster->then($parser);
+    }
+
+    protected function getCaster(): ?PropertyParser
     {
         $casters = $this->getUserDefinedCasters();
 
         if (count($casters) > 0) {
-            return (new CastablePropertyParser($this->property, $casters))
-                ->then($this->getPropertyParser());
+            return $casters[0];
+
+            return new CastablePropertyParser($this->property, $casters);
         }
 
         if ($caster = $this->getInferredCasters()) {
-            return (new CastablePropertyParser($this->property, [$caster]))
-                ->then($this->getPropertyParser());
+            return $caster;
+
+            return new CastablePropertyParser($this->property, [$caster]);
         }
 
-        return $this->getPropertyParser();
+        return null;
     }
 
-    protected function getPropertyParser(): PropertyParser
+    protected function getPropertyParser(): ?PropertyParser
     {
         if ($this->property->getType()->isBuiltin()) {
             return new PlainPropertyParser($this->property);
+
+            return null;
         }
 
-        return new DataPropertyParser($this->property);
+        if ($this->property->getType()->firstOf(Data::class)) {
+            return new DataPropertyParser($this->property);
+        }
+
+        return null;
+
     }
 
     protected function getUserDefinedCasters(): array
@@ -64,7 +91,7 @@ class PropertyParserFactory
         return $casters;
     }
 
-    protected function getInferredCasters(): ?Caster
+    protected function getInferredCasters(): ?PropertyParser
     {
         $type = $this->property->getType();
 

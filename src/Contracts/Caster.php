@@ -4,5 +4,5 @@ namespace Mementohub\Data\Contracts;
 
 interface Caster
 {
-    public function cast(mixed $value, array $context): mixed;
+    public function parse(mixed $value, array $context): mixed;
 }

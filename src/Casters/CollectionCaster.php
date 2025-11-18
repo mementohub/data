@@ -2,13 +2,13 @@
 
 namespace Mementohub\Data\Casters;
 
-use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Entities\DataProperty;
 use Mementohub\Data\Parsers\Contracts\ClassParser;
+use Mementohub\Data\Parsers\Contracts\PropertyParser;
 use Mementohub\Data\Parsers\Factories\ClassParserFactory;
 use Traversable;
 
-class CollectionCaster implements Caster
+class CollectionCaster implements PropertyParser
 {
     protected readonly ClassParser $parser;
 
@@ -25,7 +25,7 @@ class CollectionCaster implements Caster
         $this->type = $this->property->getType()->firstOf(Traversable::class);
     }
 
-    public function cast(mixed $value, array $context): mixed
+    public function parse(mixed $value, array $context): mixed
     {
         if (! is_array($value)) {
             return $value;

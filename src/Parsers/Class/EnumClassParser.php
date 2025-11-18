@@ -7,6 +7,8 @@ use Mementohub\Data\Parsers\Contracts\ClassParser;
 
 class EnumClassParser implements ClassParser
 {
+    protected array $cached = [];
+
     public function __construct(
         public readonly DataClass $class
     ) {}
@@ -17,6 +19,6 @@ class EnumClassParser implements ClassParser
             return $data;
         }
 
-        return $this->class->name::from($data);
+        return $this->cached[$data] ??= $this->class->name::from($data);
     }
 }

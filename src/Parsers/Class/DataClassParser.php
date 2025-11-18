@@ -22,17 +22,33 @@ class DataClassParser implements ClassParser
             return $data;
         }
 
-        foreach (array_intersect_key($this->property_processors, $data) as $property => $processor) {
-            $data[$property] = $processor->parse($data[$property], $data);
+        $processed = [];
+        foreach ($this->property_processors as $property => $processor) {
+            if (isset($data[$property])) {
+                if ($processor === null) {
+                    $processed[] = $data[$property];
+                } else {
+                    $value = $data[$property];
+                    foreach ([$processor] as $p) {
+                        $value = $p->parse($value, $data);
+                    }
+                    $processed[] = $value;
+                }
+            } else {
+                $processed[] = $this->class->defaults[$property];
+            }
+
         }
 
-        return $this->class->buildFromWithDefaults($data);
+        return new $this->class->name(...$processed);
     }
 
     protected function setPropertyProcesors()
     {
         foreach ($this->class->getProperties() as $property) {
             if (! $property->needsParsing()) {
+                $this->property_processors[$property->getName()] = null;
+
                 continue;
             }
 

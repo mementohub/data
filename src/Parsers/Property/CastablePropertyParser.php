@@ -19,10 +19,14 @@ class CastablePropertyParser implements PropertyParser
     public function parse(mixed $value, array $context): mixed
     {
         foreach ($this->casters as $caster) {
-            $value = $caster->cast($value, $context);
+            return $caster->cast($value, $context);
         }
 
-        return $this->next->parse($value, $context);
+        if (isset($this->next)) {
+            return $this->next->parse($value, $context);
+        }
+
+        return $value;
     }
 
     public function then(PropertyParser $next): PropertyParser
