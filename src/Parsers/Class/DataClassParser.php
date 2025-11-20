@@ -31,9 +31,9 @@ class DataClassParser implements Parser
                 }
                 $processed[] = $data[$property];
             } else {
-                // if (array_key_exists($property, $this->class->defaults)) {
-                $processed[] = $this->class->defaults[$property];
-                // }
+                if (array_key_exists($property, $this->class->defaults)) {
+                    $processed[] = $this->class->defaults[$property];
+                }
             }
         }
 
