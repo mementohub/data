@@ -10,6 +10,7 @@ use Mementohub\Data\Attributes\CollectionOf;
 use Mementohub\Data\Casters\CollectionCaster;
 use Mementohub\Data\Casters\DateTimeCaster;
 use Mementohub\Data\Casters\EnumCaster;
+use Mementohub\Data\Casters\MultiCaster;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Data;
 use Mementohub\Data\Entities\DataProperty;
@@ -21,19 +22,23 @@ class Casters
         protected readonly DataProperty $property
     ) {}
 
-    /** @return Caster[] */
-    public static function for(DataProperty $property): array
+    public static function for(DataProperty $property): Caster
     {
         return new self($property)->resolve();
     }
 
-    /** @return Caster[] */
-    protected function resolve(): array
+    protected function resolve(): Caster
     {
-        return array_filter([
+        $casters = array_filter([
             ...$this->getSpecificCasters(),
             ...$this->getDataCaster(),
         ]);
+
+        if (count($casters) !== 1) {
+            return new MultiCaster($this->property, $casters);
+        }
+
+        return $casters[0];
     }
 
     protected function getDataCaster(): array
@@ -45,6 +50,7 @@ class Casters
         return [];
     }
 
+    /** @return Caster[] */
     protected function getSpecificCasters(): array
     {
         $userDefined = $this->getUserDefinedCasters();

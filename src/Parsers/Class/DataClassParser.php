@@ -8,7 +8,7 @@ use Mementohub\Data\Factories\Casters;
 
 class DataClassParser implements Parser
 {
-    /** @var array<string, Caster[]> */
+    /** @var Caster[] */
     protected array $casters = [];
 
     public function __construct(
@@ -24,12 +24,9 @@ class DataClassParser implements Parser
         }
 
         $processed = [];
-        foreach ($this->casters as $property => $casters) {
+        foreach ($this->casters as $property => $caster) {
             if (isset($data[$property])) {
-                foreach ($casters as $caster) {
-                    $data[$property] = $caster->handle($data[$property], $data);
-                }
-                $processed[] = $data[$property];
+                $processed[] = $caster->handle($data[$property], $data);
             } else {
                 if (array_key_exists($property, $this->class->defaults)) {
                     $processed[] = $this->class->defaults[$property];
