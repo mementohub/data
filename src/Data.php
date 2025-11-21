@@ -8,11 +8,11 @@ abstract class Data
 {
     public static function from(array $payload): static
     {
-        foreach (Parsers::for(static::class) as $parser) {
-            $payload = $parser->handle($payload);
+        if (is_null($parser = Parsers::for(static::class))) {
+            return new static(...$payload);
         }
 
-        return $payload;
+        return $parser->handle($payload);
     }
 
     public static function normalizers(): array

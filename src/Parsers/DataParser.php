@@ -1,12 +1,12 @@
 <?php
 
-namespace Mementohub\Data\Parsers\Class;
+namespace Mementohub\Data\Parsers;
 
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
 use Mementohub\Data\Factories\Casters;
 
-class DataClassParser implements Parser
+class DataParser implements Parser
 {
     /** @var Caster[] */
     protected array $casters = [];
@@ -26,10 +26,15 @@ class DataClassParser implements Parser
         $processed = [];
         foreach ($this->casters as $property => $caster) {
             if (isset($data[$property])) {
-                $processed[] = $caster->handle($data[$property], $data);
+                if (is_null($caster)) {
+                    $processed[$property] = $data[$property];
+
+                    continue;
+                }
+                $processed[$property] = $caster->handle($data[$property], $data);
             } else {
                 if (array_key_exists($property, $this->class->defaults)) {
-                    $processed[] = $this->class->defaults[$property];
+                    $processed[$property] = $this->class->defaults[$property];
                 }
             }
         }

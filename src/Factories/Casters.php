@@ -8,13 +8,13 @@ use Illuminate\Support\Collection;
 use Mementohub\Data\Attributes\CastUsing;
 use Mementohub\Data\Attributes\CollectionOf;
 use Mementohub\Data\Casters\CollectionCaster;
+use Mementohub\Data\Casters\DataCaster;
 use Mementohub\Data\Casters\DateTimeCaster;
 use Mementohub\Data\Casters\EnumCaster;
 use Mementohub\Data\Casters\MultiCaster;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Data;
 use Mementohub\Data\Entities\DataProperty;
-use Mementohub\Data\Parsers\Property\DataPropertyParser;
 
 class Casters
 {
@@ -22,29 +22,29 @@ class Casters
         protected readonly DataProperty $property
     ) {}
 
-    public static function for(DataProperty $property): Caster
+    public static function for(DataProperty $property): ?Caster
     {
         return new self($property)->resolve();
     }
 
-    protected function resolve(): Caster
+    protected function resolve(): ?Caster
     {
         $casters = array_filter([
             ...$this->getSpecificCasters(),
             ...$this->getDataCaster(),
         ]);
 
-        if (count($casters) !== 1) {
-            return new MultiCaster($this->property, $casters);
-        }
-
-        return $casters[0];
+        return match (count($casters)) {
+            0 => null,
+            1 => $casters[0],
+            default => new MultiCaster($this->property, $casters),
+        };
     }
 
     protected function getDataCaster(): array
     {
         if ($this->property->getType()->firstOf(Data::class)) {
-            return [new DataPropertyParser($this->property)];
+            return [new DataCaster($this->property)];
         }
 
         return [];

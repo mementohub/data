@@ -1,13 +1,13 @@
 <?php
 
-namespace Mementohub\Data\Parsers\Class;
+namespace Mementohub\Data\Parsers;
 
 use Exception;
 use Mementohub\Data\Attributes\MapInputName;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
 
-class InputMappingClassParser implements Parser
+class InputMappingParser implements Parser
 {
     protected Parser $next;
 

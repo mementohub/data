@@ -1,11 +1,11 @@
 <?php
 
-namespace Mementohub\Data\Parsers\Class;
+namespace Mementohub\Data\Parsers;
 
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
 
-class EnumClassParser implements Parser
+class EnumParser implements Parser
 {
     protected array $cached = [];
 

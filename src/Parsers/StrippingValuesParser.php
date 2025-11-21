@@ -1,13 +1,13 @@
 <?php
 
-namespace Mementohub\Data\Parsers\Class;
+namespace Mementohub\Data\Parsers;
 
 use Exception;
 use Mementohub\Data\Attributes\StripValues;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
 
-class StrippingValuesClassParser implements Parser
+class StrippingValuesParser implements Parser
 {
     protected readonly array $strippers;
 

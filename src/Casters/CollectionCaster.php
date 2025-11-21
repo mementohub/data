@@ -10,8 +10,7 @@ use Traversable;
 
 class CollectionCaster implements Caster
 {
-    /** @var Parser[] */
-    protected readonly array $parsers;
+    protected readonly ?Parser $parser;
 
     protected readonly ?string $type;
 
@@ -20,9 +19,9 @@ class CollectionCaster implements Caster
         protected readonly ?string $class
     ) {
         if ($class) {
-            $this->parsers = Parsers::for($class);
+            $this->parser = Parsers::for($class);
         } else {
-            $this->parsers = [];
+            $this->parser = null;
         }
 
         $this->type = $this->property->getType()->firstOf(Traversable::class);
@@ -34,7 +33,7 @@ class CollectionCaster implements Caster
             return $value;
         }
 
-        if (count($this->parsers) == 0) {
+        if (is_null($this->parser)) {
             if (is_null($this->type)) {
                 return $value;
             }
@@ -44,10 +43,7 @@ class CollectionCaster implements Caster
 
         $collection = [];
         foreach ($value as $key => $item) {
-            foreach ($this->parsers as $parser) {
-                $item = $parser->handle($item, $context);
-            }
-            $collection[$key] = $item;
+            $collection[$key] = $this->parser->handle($item, $context);
         }
 
         if (is_null($this->type)) {

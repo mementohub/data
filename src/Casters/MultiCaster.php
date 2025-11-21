@@ -7,8 +7,6 @@ use Mementohub\Data\Entities\DataProperty;
 
 class MultiCaster implements Caster
 {
-    protected array $cached = [];
-
     public function __construct(
         protected readonly DataProperty $property,
         /** @var Caster[] */

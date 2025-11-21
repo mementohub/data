@@ -5,12 +5,14 @@ namespace Mementohub\Data\Factories;
 use Mementohub\Data\Attributes\MapInputName;
 use Mementohub\Data\Attributes\StripValues;
 use Mementohub\Data\Contracts\Normalizer;
+use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Data;
 use Mementohub\Data\Entities\DataClass;
-use Mementohub\Data\Parsers\Class\DataClassParser;
-use Mementohub\Data\Parsers\Class\EnumClassParser;
-use Mementohub\Data\Parsers\Class\InputMappingClassParser;
-use Mementohub\Data\Parsers\Class\StrippingValuesClassParser;
+use Mementohub\Data\Parsers\DataParser;
+use Mementohub\Data\Parsers\EnumParser;
+use Mementohub\Data\Parsers\InputMappingParser;
+use Mementohub\Data\Parsers\MultiParser;
+use Mementohub\Data\Parsers\StrippingValuesParser;
 
 class Parsers
 {
@@ -18,8 +20,7 @@ class Parsers
 
     protected DataClass $class;
 
-    /** @return Parser[] */
-    public static function for(string $class): array
+    public static function for(string $class): ?Parser
     {
         return static::$resolved[$class] ??= new self($class)->resolve();
     }
@@ -29,17 +30,23 @@ class Parsers
         $this->class = new DataClass($class);
     }
 
-    /** @return Parser[] */
-    protected function resolve(): array
+    protected function resolve(): ?Parser
     {
-        return array_filter([
+        $parsers = array_filter([
             ...$this->resolveNormalizers(),
             ...$this->resolveInputMapper(),
             ...$this->resolveStrippingValues(),
             ...$this->resolveParsers(),
         ]);
+
+        return match (count($parsers)) {
+            0 => null,
+            1 => $parsers[0],
+            default => new MultiParser($this->class, $parsers),
+        };
     }
 
+    /** @return Parser[] */
     protected function resolveNormalizers(): array
     {
         if (! is_a($this->class->name, Data::class, true)) {
@@ -60,32 +67,35 @@ class Parsers
         return $resolved;
     }
 
+    /** @return Parser[] */
     protected function resolveInputMapper(): array
     {
         if (! $this->class->hasAttribute(MapInputName::class)) {
             return [];
         }
 
-        return [new InputMappingClassParser($this->class)];
+        return [new InputMappingParser($this->class)];
     }
 
+    /** @return Parser[] */
     protected function resolveStrippingValues(): array
     {
         if (! $this->class->hasAttribute(StripValues::class)) {
             return [];
         }
 
-        return [new StrippingValuesClassParser($this->class)];
+        return [new StrippingValuesParser($this->class)];
     }
 
+    /** @return Parser[] */
     protected function resolveParsers(): array
     {
         if ($this->class->isEnum()) {
-            return [new EnumClassParser($this->class)];
+            return [new EnumParser($this->class)];
         }
 
         if ($this->class->isDataClass()) {
-            return [new DataClassParser($this->class)];
+            return [new DataParser($this->class)];
         }
 
         return [];
