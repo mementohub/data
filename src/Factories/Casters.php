@@ -4,7 +4,6 @@ namespace Mementohub\Data\Factories;
 
 use BackedEnum;
 use DateTimeInterface;
-use Illuminate\Support\Collection;
 use Mementohub\Data\Attributes\CastUsing;
 use Mementohub\Data\Attributes\CollectionOf;
 use Mementohub\Data\Casters\CollectionCaster;
@@ -15,6 +14,7 @@ use Mementohub\Data\Casters\MultiCaster;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Data;
 use Mementohub\Data\Entities\DataProperty;
+use Traversable;
 
 class Casters
 {
@@ -89,7 +89,7 @@ class Casters
             return [new EnumCaster($this->property, $enum)];
         }
 
-        if ($type->firstOf(Collection::class) || $type->firstOf('array')) {
+        if ($type->firstOf(Traversable::class) || $type->firstOf('array')) {
             $class = $this->property->inferArrayTypeFromDocBlock();
 
             return [new CollectionCaster($this->property, $class)];

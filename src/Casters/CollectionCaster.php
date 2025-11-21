@@ -2,6 +2,7 @@
 
 namespace Mementohub\Data\Casters;
 
+use Generator;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataProperty;
@@ -31,6 +32,16 @@ class CollectionCaster implements Caster
     {
         if (! is_array($value)) {
             return $value;
+        }
+
+        if ($this->type === Generator::class) {
+            if (is_null($this->parser)) {
+                return yield from $value;
+            }
+
+            foreach ($value as $item) {
+                yield from $this->parser->handle($item, $context);
+            }
         }
 
         if (is_null($this->parser)) {
