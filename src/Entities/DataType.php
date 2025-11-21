@@ -16,12 +16,6 @@ class DataType
         protected readonly ReflectionType $type
     ) {}
 
-    public function isBuiltin(): bool
-    {
-        return ($this->type instanceof ReflectionNamedType)
-            && $this->type->isBuiltin();
-    }
-
     public function firstOf(string $abstract): ?string
     {
         foreach ($this->getTypes() as $type) {
@@ -55,9 +49,7 @@ class DataType
 
         if ($this->type instanceof ReflectionUnionType) {
             foreach ($this->type->getTypes() as $type) {
-                // if ($type->getName() !== Optional::class) {
                 return $type;
-                // }
             }
         }
 

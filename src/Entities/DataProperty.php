@@ -2,13 +2,10 @@
 
 namespace Mementohub\Data\Entities;
 
-use Mementohub\Data\Attributes\CastUsing;
-use Mementohub\Data\Attributes\CollectionOf;
 use Mementohub\Data\Values\Optional;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Object_;
-use ReflectionAttribute;
 use ReflectionProperty;
 
 /**
@@ -30,26 +27,6 @@ class DataProperty
         return $this->getType()->allowsNull();
     }
 
-    public function needsParsing(): bool
-    {
-        if ($this->isCastable()) {
-            return true;
-        }
-
-        return ! $this->getType()->isBuiltin();
-    }
-
-    public function getCastableAttributes(): array
-    {
-        return array_filter(
-            $this->property->getAttributes(),
-            fn (ReflectionAttribute $attribute) => in_array($attribute->getName(), [
-                CastUsing::class,
-                CollectionOf::class,
-            ])
-        );
-    }
-
     public function inferArrayTypeFromDocBlock(): ?string
     {
         if (! $this->property->getDocComment()) {
@@ -59,6 +36,7 @@ class DataProperty
         $factory = DocBlockFactory::createInstance();
         $docblock = $factory->create($this->property->getDocComment());
 
+        /** @var \phpDocumentor\Reflection\DocBlock\Tag $tag */
         foreach ($docblock->getTagsByName('var') as $tag) {
             if (! ($type = $tag->getType()) instanceof Array_) {
                 continue;
@@ -95,15 +73,6 @@ class DataProperty
         }
 
         return null;
-    }
-
-    protected function isCastable(): bool
-    {
-        if ($this->getType()->firstOf('array')) {
-            return true;
-        }
-
-        return count($this->getCastableAttributes()) > 0;
     }
 
     public function getType(): DataType

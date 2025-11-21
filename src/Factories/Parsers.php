@@ -94,7 +94,7 @@ class Parsers
             return [new EnumParser($this->class)];
         }
 
-        if ($this->class->isDataClass()) {
+        if ($this->class->isSubclassOf(Data::class)) {
             return [new DataParser($this->class)];
         }
 

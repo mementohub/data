@@ -25,18 +25,21 @@ class DataParser implements Parser
 
         $processed = [];
         foreach ($this->casters as $property => $caster) {
-            if (isset($data[$property])) {
-                if (is_null($caster)) {
-                    $processed[$property] = $data[$property];
-
-                    continue;
-                }
-                $processed[$property] = $caster->handle($data[$property], $data);
-            } else {
+            if (! array_key_exists($property, $data)) {
                 if (array_key_exists($property, $this->class->defaults)) {
                     $processed[$property] = $this->class->defaults[$property];
                 }
+
+                continue;
             }
+
+            if (is_null($caster)) {
+                $processed[$property] = $data[$property];
+
+                continue;
+            }
+
+            $processed[$property] = $caster->handle($data[$property], $data);
         }
 
         return new $this->class->name(...$processed);

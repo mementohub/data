@@ -16,10 +16,10 @@ class EnumCaster implements Caster
 
     public function handle(mixed $value, array $context): mixed
     {
-        if (isset($this->cached[$value])) {
-            return $this->cached[$value];
+        if (is_string($value) || is_int($value)) {
+            return $this->class::from($value);
         }
 
-        return $this->cached[$value] = $this->class::from($value);
+        return $value;
     }
 }

@@ -15,10 +15,10 @@ class EnumParser implements Parser
 
     public function handle(mixed $data): mixed
     {
-        if (! is_int($data) && ! is_string($data)) {
-            return $data;
+        if (is_string($data) || is_int($data)) {
+            return $this->cached[$data] ??= $this->class->name::from($data);
         }
 
-        return $this->cached[$data] ??= $this->class->name::from($data);
+        return $data;
     }
 }

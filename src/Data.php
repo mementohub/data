@@ -8,11 +8,15 @@ abstract class Data
 {
     public static function from(array $payload): static
     {
-        if (is_null($parser = Parsers::for(static::class))) {
-            return new static(...$payload);
-        }
+        // ray(Parsers::for(static::class));
 
-        return $parser->handle($payload);
+        return Parsers::for(static::class)?->handle($payload)
+            ?? new static(...$payload);
+        // if (is_null($parser = Parsers::for(static::class))) {
+        //     return new static(...$payload);
+        // }
+
+        // return $parser->handle($payload);
     }
 
     public static function normalizers(): array
