@@ -4,19 +4,21 @@ namespace Mementohub\Data\Factories;
 
 use BackedEnum;
 use DateTimeInterface;
+use Generator;
 use Mementohub\Data\Attributes\CastUsing;
 use Mementohub\Data\Attributes\CollectionOf;
 use Mementohub\Data\Casters\CollectionCaster;
 use Mementohub\Data\Casters\DataCaster;
 use Mementohub\Data\Casters\DateTimeCaster;
 use Mementohub\Data\Casters\EnumCaster;
+use Mementohub\Data\Casters\GeneratorCaster;
 use Mementohub\Data\Casters\MultiCaster;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Data;
 use Mementohub\Data\Entities\DataProperty;
 use Traversable;
 
-class Casters
+class CasterFactory
 {
     public function __construct(
         protected readonly DataProperty $property
@@ -91,6 +93,10 @@ class Casters
 
         if ($type->firstOf(Traversable::class) || $type->firstOf('array')) {
             $class = $this->property->inferArrayTypeFromDocBlock();
+
+            if ($type->firstOf(Traversable::class) === Generator::class) {
+                return [new GeneratorCaster($this->property, $class)];
+            }
 
             return [new CollectionCaster($this->property, $class)];
         }

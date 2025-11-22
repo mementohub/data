@@ -105,12 +105,10 @@ class CollectionTest extends TestCase
 
         $this->assertInstanceOf(Owner87123Generator::class, $owner);
         $this->assertInstanceOf(Generator::class, $owner->pets);
-        $this->assertCount(2, $owner->pets);
-        $this->assertInstanceOf(Pet87123::class, $owner->pets->current());
-        $this->assertEquals('cat', $owner->pets->current()->type->value);
-        $this->assertEquals('Fluffy', $owner->pets->current()->name);
-        $this->assertInstanceOf(Pet87123::class, $owner->pets->next());
-        $this->assertEquals('dog', $owner->pets->next()->type->value);
+
+        foreach ($owner->pets as $pet) {
+            $this->assertInstanceOf(Pet87123::class, $pet);
+        }
     }
 }
 

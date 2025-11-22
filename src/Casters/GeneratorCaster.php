@@ -6,9 +6,8 @@ use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataProperty;
 use Mementohub\Data\Factories\ParserFactory;
-use Traversable;
 
-class CollectionCaster implements Caster
+class GeneratorCaster implements Caster
 {
     protected readonly ?Parser $parser;
 
@@ -19,8 +18,6 @@ class CollectionCaster implements Caster
         protected readonly ?string $class
     ) {
         $this->parser = $class ? ParserFactory::for($class) : null;
-
-        $this->type = $this->property->getType()->firstOf(Traversable::class);
     }
 
     public function handle(mixed $value, array $context): mixed
@@ -30,22 +27,11 @@ class CollectionCaster implements Caster
         }
 
         if (is_null($this->parser)) {
-            if (is_null($this->type)) {
-                return $value;
-            }
-
-            return new $this->type($value);
+            return yield from $value;
         }
 
-        $collection = [];
-        foreach ($value as $key => $item) {
-            $collection[$key] = $this->parser->handle($item, $context);
+        foreach ($value as $item) {
+            yield $this->parser->handle($item, $context);
         }
-
-        if (is_null($this->type)) {
-            return $collection;
-        }
-
-        return new $this->type($collection);
     }
 }

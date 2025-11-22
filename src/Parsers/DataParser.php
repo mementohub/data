@@ -4,7 +4,7 @@ namespace Mementohub\Data\Parsers;
 
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
-use Mementohub\Data\Factories\Casters;
+use Mementohub\Data\Factories\CasterFactory;
 
 class DataParser implements Parser
 {
@@ -48,7 +48,7 @@ class DataParser implements Parser
     protected function resolveCasters()
     {
         foreach ($this->class->getProperties() as $property) {
-            $this->casters[$property->getName()] = Casters::for($property);
+            $this->casters[$property->getName()] = CasterFactory::for($property);
         }
     }
 }

@@ -14,7 +14,7 @@ use Mementohub\Data\Parsers\InputMappingParser;
 use Mementohub\Data\Parsers\MultiParser;
 use Mementohub\Data\Parsers\StrippingValuesParser;
 
-class Parsers
+class ParserFactory
 {
     protected static array $resolved = [];
 

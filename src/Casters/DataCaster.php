@@ -5,7 +5,7 @@ namespace Mementohub\Data\Casters;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataProperty;
-use Mementohub\Data\Factories\Parsers;
+use Mementohub\Data\Factories\ParserFactory;
 
 class DataCaster implements Caster
 {
@@ -14,7 +14,7 @@ class DataCaster implements Caster
     public function __construct(
         public readonly DataProperty $property
     ) {
-        $this->parser = Parsers::for($property->getType()->getMainType());
+        $this->parser = ParserFactory::for($property->getType()->getMainType());
     }
 
     public function handle(mixed $value, array $context): mixed

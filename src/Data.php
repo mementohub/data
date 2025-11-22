@@ -2,7 +2,7 @@
 
 namespace Mementohub\Data;
 
-use Mementohub\Data\Factories\Parsers;
+use Mementohub\Data\Factories\ParserFactory;
 
 abstract class Data
 {
@@ -10,7 +10,7 @@ abstract class Data
     {
         // ray(Parsers::for(static::class));
 
-        return Parsers::for(static::class)?->handle($payload)
+        return ParserFactory::for(static::class)?->handle($payload)
             ?? new static(...$payload);
         // if (is_null($parser = Parsers::for(static::class))) {
         //     return new static(...$payload);
