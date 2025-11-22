@@ -63,8 +63,8 @@ class DataType
         }
 
         if ($this->type instanceof ReflectionUnionType) {
-            foreach ($this->type->getTypes() as $type) {
-                if ($type->getName() === $type) {
+            foreach ($this->type->getTypes() as $namedType) {
+                if ($namedType->getName() === $type) {
                     return true;
                 }
             }
