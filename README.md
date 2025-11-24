@@ -28,9 +28,20 @@ class User extends Data
     public function __construct(
         public readonly string $name,
         public readonly string $email,
-        public readonly int $age,
+        public readonly DateTimeImmutable $birthday,
+        /** @var Team[] */
+        public readonly array $teams
     ) {}
 }
+
+class Team extends Data
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly string $description,
+    ) {}
+}
+
 ```
 
 ### Parsing into Data
@@ -41,7 +52,17 @@ To parse an array into a data class, use the `from` method.
 $user = User::from([
     'name' => 'John Doe',
     'email' => 'john@example.com',
-    'age' => 30,
+    'birthday' => '2023-01-01',
+    'teams' => [
+        [
+            'name' => 'Team 1',
+            'description' => 'Description 1',
+        ],
+        [
+            'name' => 'Team 2',
+            'description' => 'Description 2',
+        ],
+    ],
 ]);
 ```
 
