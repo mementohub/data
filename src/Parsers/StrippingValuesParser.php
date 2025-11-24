@@ -43,15 +43,13 @@ class StrippingValuesParser implements Parser
 
     protected function resolveStrippers(): array
     {
+        $strippers = [];
         foreach ($this->class->getProperties() as $property) {
-            $attributes = $property->getAttributes(StripValues::class);
-            if (count($attributes) === 0) {
-                continue;
+            if ($attribute = $property->getFirstAttributeInstance(StripValues::class)) {
+                $strippers[$property->getName()] = $attribute->arguments;
             }
-
-            $mappers[$property->getName()] = $attributes[0]->getArguments();
         }
 
-        return $mappers;
+        return $strippers;
     }
 }

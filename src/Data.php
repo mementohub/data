@@ -2,20 +2,14 @@
 
 namespace Mementohub\Data;
 
-use Mementohub\Data\Factories\ParserFactory;
+use Illuminate\Contracts\Support\Arrayable;
+use Mementohub\Data\Traits\Normalizable;
+use Mementohub\Data\Traits\Parsable;
+use Mementohub\Data\Traits\Transformable;
 
-abstract class Data
+abstract class Data implements Arrayable
 {
-    public static function from(array $payload): static
-    {
-
-        return ParserFactory::for(static::class)
-            ?->handle($payload)
-            ?? new static(...$payload);
-    }
-
-    public static function normalizers(): array
-    {
-        return [];
-    }
+    use Normalizable;
+    use Parsable;
+    use Transformable;
 }

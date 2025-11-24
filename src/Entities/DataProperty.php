@@ -2,11 +2,14 @@
 
 namespace Mementohub\Data\Entities;
 
+use BackedEnum;
+use DateTimeInterface;
 use Mementohub\Data\Values\Optional;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Object_;
 use ReflectionProperty;
+use Traversable;
 
 /**
  * @mixin ReflectionProperty
@@ -16,6 +19,22 @@ class DataProperty
     public function __construct(
         protected readonly ReflectionProperty $property
     ) {}
+
+    public function isEnum(): bool
+    {
+        return $this->getType()->firstOf(BackedEnum::class) !== null;
+    }
+
+    public function isDateTime(): bool
+    {
+        return $this->getType()->firstOf(DateTimeInterface::class) !== null;
+    }
+
+    public function isTraversable(): bool
+    {
+        return $this->getType()->firstOf(Traversable::class) !== null
+            || $this->getType()->firstOf('array') !== null;
+    }
 
     public function allowsOptional(): bool
     {
@@ -73,6 +92,17 @@ class DataProperty
         }
 
         return null;
+    }
+
+    public function getFirstAttributeInstance(string $name): mixed
+    {
+        $attributes = $this->property->getAttributes($name);
+
+        if (count($attributes) === 0) {
+            return null;
+        }
+
+        return $attributes[0]->newInstance();
     }
 
     public function getType(): DataType

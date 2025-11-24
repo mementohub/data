@@ -3,7 +3,6 @@
 namespace Mementohub\Data\Factories;
 
 use BackedEnum;
-use DateTimeInterface;
 use Generator;
 use Mementohub\Data\Attributes\CastUsing;
 use Mementohub\Data\Attributes\CollectionOf;
@@ -68,15 +67,10 @@ class CasterFactory
     {
         $resolved = [];
 
-        foreach ($this->property->getAttributes() as $attribute) {
-            if (! in_array($attribute->getName(), [
-                CastUsing::class,
-                CollectionOf::class,
-            ])) {
-                continue;
+        foreach ([CastUsing::class, CollectionOf::class] as $attribute) {
+            if ($attribute = $this->property->getFirstAttributeInstance($attribute)) {
+                $resolved[] = $attribute->make($this->property);
             }
-
-            $resolved[] = $attribute->newInstance()->make($this->property);
         }
 
         return $resolved;
@@ -87,11 +81,11 @@ class CasterFactory
     {
         $type = $this->property->getType();
 
-        if ($enum = $type->firstOf(BackedEnum::class)) {
-            return [new EnumCaster($this->property, $enum)];
+        if ($this->property->isEnum()) {
+            return [new EnumCaster($this->property, $type->firstOf(BackedEnum::class))];
         }
 
-        if ($type->firstOf(Traversable::class) || $type->firstOf('array')) {
+        if ($this->property->isTraversable()) {
             $class = $this->property->inferArrayTypeFromDocBlock();
 
             if ($type->firstOf(Traversable::class) === Generator::class) {
@@ -101,7 +95,7 @@ class CasterFactory
             return [new CollectionCaster($this->property, $class)];
         }
 
-        if ($type->firstOf(DateTimeInterface::class)) {
+        if ($this->property->isDateTime()) {
             return [new DateTimeCaster($this->property)];
         }
 

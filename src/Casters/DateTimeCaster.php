@@ -3,6 +3,7 @@
 namespace Mementohub\Data\Casters;
 
 use DateTimeInterface;
+use Mementohub\Data\Attributes\DateTimeFormat;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Entities\DataProperty;
 
@@ -14,10 +15,14 @@ class DateTimeCaster implements Caster
 
     public function __construct(
         protected readonly DataProperty $property,
-        protected readonly ?string $format = null,
+        protected ?string $format = null,
         protected readonly bool $cacheable = true
     ) {
         $this->type = $this->property->getType()->getName();
+
+        if (! $this->format) {
+            $this->format = $this->property->getFirstAttributeInstance(DateTimeFormat::class)?->input;
+        }
     }
 
     public function handle(mixed $value, array $context): ?DateTimeInterface

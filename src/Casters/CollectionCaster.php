@@ -16,7 +16,7 @@ class CollectionCaster implements Caster
 
     public function __construct(
         protected readonly DataProperty $property,
-        protected readonly ?string $class
+        protected readonly ?string $class = null
     ) {
         $this->parser = $class ? ParserFactory::for($class) : null;
 

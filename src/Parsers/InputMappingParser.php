@@ -88,12 +88,9 @@ class InputMappingParser implements Parser
         $mappers = [];
 
         foreach ($this->class->getProperties() as $property) {
-            $attributes = $property->getAttributes(MapInputName::class);
-            if (count($attributes) === 0) {
-                continue;
+            if ($attribute = $property->getFirstAttributeInstance(MapInputName::class)) {
+                $mappers[$attribute->input] = $property->getName();
             }
-
-            $mappers[$attributes[0]->getArguments()[0]] = $property->getName();
         }
 
         return $mappers;

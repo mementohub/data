@@ -73,6 +73,17 @@ class DataType
         return false;
     }
 
+    public function isBuiltin(): bool
+    {
+        foreach ($this->getTypes() as $type) {
+            if (! $type->isBuiltin()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function __call($name, $arguments)
     {
         return $this->type->$name(...$arguments);

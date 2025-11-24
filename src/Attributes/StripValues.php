@@ -7,7 +7,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class StripValues
 {
-    protected readonly array $arguments;
+    public readonly array $arguments;
 
     public function __construct(
         mixed ...$arguments

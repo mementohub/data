@@ -8,13 +8,13 @@ use Mementohub\Data\Factories\CasterFactory;
 
 class DataParser implements Parser
 {
-    /** @var Caster[] */
-    protected array $casters = [];
+    /** @var array<string, Caster> */
+    protected readonly array $casters;
 
     public function __construct(
         public readonly DataClass $class
     ) {
-        $this->resolveCasters();
+        $this->casters = $this->resolveCasters();
     }
 
     public function handle(mixed $data): mixed
@@ -47,8 +47,11 @@ class DataParser implements Parser
 
     protected function resolveCasters()
     {
+        $casters = [];
         foreach ($this->class->getProperties() as $property) {
-            $this->casters[$property->getName()] = CasterFactory::for($property);
+            $casters[$property->getName()] = CasterFactory::for($property);
         }
+
+        return $casters;
     }
 }

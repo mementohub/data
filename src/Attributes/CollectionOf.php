@@ -16,6 +16,7 @@ class CollectionOf
     protected readonly array $arguments;
 
     public function __construct(
+        public readonly string $class,
         mixed ...$arguments
     ) {
         $this->arguments = $arguments;
@@ -24,9 +25,9 @@ class CollectionOf
     public function make(DataProperty $property): Caster
     {
         if ($property->getType()->firstOf(Traversable::class) === Generator::class) {
-            return new GeneratorCaster($property, ...$this->arguments);
+            return new GeneratorCaster($property, $this->class, ...$this->arguments);
         }
 
-        return new CollectionCaster($property, ...$this->arguments);
+        return new CollectionCaster($property, $this->class, ...$this->arguments);
     }
 }
