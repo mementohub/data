@@ -9,7 +9,7 @@ use Mementohub\Data\Factories\ParserFactory;
 
 class DataCaster implements Caster
 {
-    protected readonly Parser $parser;
+    protected readonly ?Parser $parser;
 
     public function __construct(
         public readonly DataProperty $property

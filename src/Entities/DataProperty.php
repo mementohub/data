@@ -4,6 +4,7 @@ namespace Mementohub\Data\Entities;
 
 use BackedEnum;
 use DateTimeInterface;
+use Mementohub\Data\Data;
 use Mementohub\Data\Values\Optional;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\Array_;
@@ -34,6 +35,11 @@ class DataProperty
     {
         return $this->getType()->firstOf(Traversable::class) !== null
             || $this->getType()->firstOf('array') !== null;
+    }
+
+    public function isData(): bool
+    {
+        return $this->getType()->firstOf(Data::class) !== null;
     }
 
     public function allowsOptional(): bool

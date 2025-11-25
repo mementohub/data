@@ -11,10 +11,13 @@ use Mementohub\Data\Transformers\CollectionTransformer;
 use Mementohub\Data\Transformers\DataTransformer;
 use Mementohub\Data\Transformers\DateTimeTransformer;
 use Mementohub\Data\Transformers\EnumTransformer;
+use Mementohub\Data\Transformers\RecursiveTransformer;
 
 class TransformerFactory
 {
-    protected static array $resolved = [];
+    public static array $resolved = [];
+
+    public static array $resolving = [];
 
     protected static array $exceptions = [];
 
@@ -22,7 +25,16 @@ class TransformerFactory
 
     public static function for(string $class): ?Transformer
     {
-        return static::$resolved[$class] ??= new self($class)->resolve();
+        if (array_key_exists($class, static::$resolving)) {
+            return new RecursiveTransformer($class);
+        }
+        static::$resolving[$class] = true;
+
+        $resolved = static::$resolved[$class] ??= new self($class)->resolve();
+
+        unset(static::$resolving[$class]);
+
+        return $resolved;
     }
 
     public static function forProperty(DataProperty $property): ?Transformer
@@ -41,6 +53,10 @@ class TransformerFactory
 
         if ($property->isTraversable()) {
             return new CollectionTransformer($property);
+        }
+
+        if ($property->isData()) {
+            return self::for($property->getType()->firstOf(Data::class));
         }
 
         if ($property->getType()->isBuiltin()) {

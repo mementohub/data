@@ -12,17 +12,29 @@ use Mementohub\Data\Parsers\DataParser;
 use Mementohub\Data\Parsers\EnumParser;
 use Mementohub\Data\Parsers\InputMappingParser;
 use Mementohub\Data\Parsers\MultiParser;
+use Mementohub\Data\Parsers\RecursiveParser;
 use Mementohub\Data\Parsers\StrippingValuesParser;
 
 class ParserFactory
 {
     protected static array $resolved = [];
 
+    protected static array $resolving = [];
+
     protected DataClass $class;
 
     public static function for(string $class): ?Parser
     {
-        return static::$resolved[$class] ??= new self($class)->resolve();
+        if (array_key_exists($class, static::$resolving)) {
+            return new RecursiveParser($class);
+        }
+        static::$resolving[$class] = true;
+
+        $resolved = static::$resolved[$class] ??= new self($class)->resolve();
+
+        unset(static::$resolving[$class]);
+
+        return $resolved;
     }
 
     public function __construct(string $class)

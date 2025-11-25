@@ -29,6 +29,10 @@ class DataTransformer implements Transformer
 
     public function handle(mixed $data): mixed
     {
+        if (is_null($data)) {
+            return null;
+        }
+
         if ($this->doesntNeedTransformation) {
             return (array) $data;
         }
