@@ -16,6 +16,8 @@ class TransformerFactory
 {
     protected static array $resolved = [];
 
+    protected static array $exceptions = [];
+
     protected DataClass $class;
 
     public static function for(string $class): ?Transformer
@@ -46,6 +48,16 @@ class TransformerFactory
         }
 
         return null;
+    }
+
+    public static function setExceptions(Data $source, array $except): void
+    {
+        static::$exceptions[spl_object_id($source)] = $except;
+    }
+
+    public static function getExceptions(Data $source): array
+    {
+        return static::$exceptions[spl_object_id($source)] ?? [];
     }
 
     public function __construct(string $class)

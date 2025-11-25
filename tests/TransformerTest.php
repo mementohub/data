@@ -92,6 +92,27 @@ class TransformerTest extends TestCase
             'name' => 'John',
         ], $person->toArray());
     }
+
+    public function test_it_transforms_except()
+    {
+        $person = PersonWithChildren98141::from([
+            'name' => 'John',
+            'children' => [
+                [
+                    'name' => 'Jimmy',
+                    'age' => 5,
+                ],
+                [
+                    'name' => 'Johnny',
+                    'age' => 10,
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'name' => 'John',
+        ], $person->except('children')->toArray());
+    }
 }
 
 class Person98141 extends Data

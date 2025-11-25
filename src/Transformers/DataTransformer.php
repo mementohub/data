@@ -17,11 +17,14 @@ class DataTransformer implements Transformer
     protected readonly bool $hasOptionals;
 
     public function __construct(
-        protected readonly DataClass $class
+        protected readonly DataClass $class,
+        protected readonly array $except = [],
     ) {
         $this->transformers = $this->resolveTransformers();
         $this->hasOptionals = $this->detectOptionals();
-        $this->doesntNeedTransformation = (count(array_filter($this->transformers)) === 0) && ! $this->hasOptionals;
+        $this->doesntNeedTransformation = (count(array_filter($this->transformers)) === 0)
+            && ! $this->hasOptionals
+            && ! count($this->except);
     }
 
     public function handle(mixed $data): mixed
@@ -52,6 +55,9 @@ class DataTransformer implements Transformer
     {
         $transformers = [];
         foreach ($this->class->getProperties() as $property) {
+            if (in_array($property->getName(), $this->except)) {
+                continue;
+            }
             $transformers[$property->getName()] = TransformerFactory::forProperty($property);
         }
 
