@@ -116,6 +116,12 @@ class DataProperty
         return new DataType($this->property->getType());
     }
 
+    public function __toString(): string
+    {
+        return $this->property->getDeclaringClass()->getName()
+            .'::['.str_replace(['Property [ ', '(set)', ' ]', "\n"], '', $this->property).']';
+    }
+
     public function __call($name, $arguments)
     {
         return $this->property->$name(...$arguments);

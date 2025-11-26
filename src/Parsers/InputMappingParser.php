@@ -2,10 +2,10 @@
 
 namespace Mementohub\Data\Parsers;
 
-use Exception;
 use Mementohub\Data\Attributes\MapInputName;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
+use Mementohub\Data\Exceptions\ParsingException;
 
 class InputMappingParser implements Parser
 {
@@ -30,8 +30,8 @@ class InputMappingParser implements Parser
 
         try {
             return $this->mapInput($data);
-        } catch (Exception $e) {
-            throw new Exception('Unable to map input data', $e->getCode(), $e);
+        } catch (\Throwable $t) {
+            throw new ParsingException('Failed to map input for these mappers:'.print_r($this->mappers, true), $this->class, $data, $t);
         }
     }
 

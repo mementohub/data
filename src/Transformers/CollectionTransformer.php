@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Mementohub\Data\Attributes\CollectionOf;
 use Mementohub\Data\Contracts\Transformer;
 use Mementohub\Data\Entities\DataProperty;
+use Mementohub\Data\Exceptions\TransformingException;
 use Mementohub\Data\Factories\TransformerFactory;
 use Traversable;
 
@@ -42,7 +43,11 @@ class CollectionTransformer implements Transformer
 
         $transformed = [];
         foreach ($value as $key => $item) {
-            $transformed[$key] = $this->transformer->handle($item);
+            try {
+                $transformed[$key] = $this->transformer->handle($item);
+            } catch (\Throwable $t) {
+                throw new TransformingException('Unable to transform item '.$key.' in collection.'."\n".$this->property, $item, $t);
+            }
         }
 
         return $transformed;

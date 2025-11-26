@@ -4,6 +4,7 @@ namespace Mementohub\Data\Transformers;
 
 use Mementohub\Data\Contracts\Transformer;
 use Mementohub\Data\Entities\DataClass;
+use Mementohub\Data\Exceptions\TransformingException;
 use Mementohub\Data\Factories\TransformerFactory;
 use Mementohub\Data\Values\Optional;
 
@@ -49,7 +50,11 @@ class DataTransformer implements Transformer
                 continue;
             }
 
-            $transformed[$property] = $transformer->handle($data->$property);
+            try {
+                $transformed[$property] = $transformer->handle($data->$property);
+            } catch (\Throwable $t) {
+                throw new TransformingException('Failed to transform property '."\n".$property, $data, $t);
+            }
         }
 
         return $transformed;

@@ -5,6 +5,7 @@ namespace Mementohub\Data\Casters;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataProperty;
+use Mementohub\Data\Exceptions\CastingException;
 use Mementohub\Data\Factories\ParserFactory;
 
 class GeneratorCaster implements Caster
@@ -30,8 +31,12 @@ class GeneratorCaster implements Caster
             return yield from $value;
         }
 
-        foreach ($value as $item) {
-            yield $this->parser->handle($item, $context);
+        foreach ($value as $key => $item) {
+            try {
+                yield $key => $this->parser->handle($item, $context);
+            } catch (\Throwable $t) {
+                throw new CastingException('Unable to parse item '.$key.' in generator', $this->property, $item, $t);
+            }
         }
     }
 }

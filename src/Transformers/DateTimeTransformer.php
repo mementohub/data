@@ -5,6 +5,7 @@ namespace Mementohub\Data\Transformers;
 use Mementohub\Data\Attributes\DateTimeFormat;
 use Mementohub\Data\Contracts\Transformer;
 use Mementohub\Data\Entities\DataProperty;
+use Mementohub\Data\Exceptions\TransformingException;
 
 class DateTimeTransformer implements Transformer
 {
@@ -22,7 +23,11 @@ class DateTimeTransformer implements Transformer
     public function handle(mixed $value): ?string
     {
         if ($value instanceof \DateTimeInterface) {
-            return $value->format($this->format);
+            try {
+                return $value->format($this->format);
+            } catch (\Throwable $t) {
+                throw new TransformingException('Unable to format date using format '.$this->format."\n".$this->property, $value, $t);
+            }
         }
 
         return null;

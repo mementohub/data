@@ -2,10 +2,10 @@
 
 namespace Mementohub\Data\Parsers;
 
-use Exception;
 use Mementohub\Data\Attributes\StripValues;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
+use Mementohub\Data\Exceptions\ParsingException;
 
 class StrippingValuesParser implements Parser
 {
@@ -25,8 +25,8 @@ class StrippingValuesParser implements Parser
 
         try {
             return $this->stripInput($data);
-        } catch (Exception $e) {
-            throw new Exception('Unable to strip input data', $e->getCode(), $e);
+        } catch (\Throwable $t) {
+            throw new ParsingException('Failed to strip values for these strippers:'.print_r($this->strippers, true), $this->class, $data, $t);
         }
     }
 

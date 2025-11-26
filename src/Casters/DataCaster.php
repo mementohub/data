@@ -5,6 +5,7 @@ namespace Mementohub\Data\Casters;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataProperty;
+use Mementohub\Data\Exceptions\CastingException;
 use Mementohub\Data\Factories\ParserFactory;
 
 class DataCaster implements Caster
@@ -23,6 +24,10 @@ class DataCaster implements Caster
             return $value;
         }
 
-        return $this->parser->handle($value, $context);
+        try {
+            return $this->parser->handle($value, $context);
+        } catch (\Throwable $t) {
+            throw new CastingException('Unable to parse data property', $this->property, $value, $t);
+        }
     }
 }

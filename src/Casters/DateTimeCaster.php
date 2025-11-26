@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Mementohub\Data\Attributes\DateTimeFormat;
 use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Entities\DataProperty;
+use Mementohub\Data\Exceptions\CastingException;
 
 class DateTimeCaster implements Caster
 {
@@ -45,10 +46,18 @@ class DateTimeCaster implements Caster
     protected function resolveValue(string $value): DateTimeInterface
     {
         if ($this->format) {
-            return $this->type::createFromFormat($this->format, $value);
+            try {
+                return $this->type::createFromFormat($this->format, $value);
+            } catch (\Throwable $t) {
+                throw new CastingException('Unable to create '.$this->type.' from format '.$this->format, $this->property, $value, $t);
+            }
         }
 
-        return new $this->type($value);
+        try {
+            return new $this->type($value);
+        } catch (\Throwable $t) {
+            throw new CastingException('Unable to create '.$this->type, $this->property, $value, $t);
+        }
     }
 
     protected function resolveType(): string

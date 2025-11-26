@@ -4,6 +4,7 @@ namespace Mementohub\Data\Parsers;
 
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
+use Mementohub\Data\Exceptions\ParsingException;
 use Mementohub\Data\Factories\CasterFactory;
 
 class DataParser implements Parser
@@ -39,10 +40,20 @@ class DataParser implements Parser
                 continue;
             }
 
-            $processed[$property] = $caster->handle($data[$property], $data);
+            try {
+                $processed[$property] = $caster->handle($data[$property], $data);
+            } catch (\Throwable $t) {
+                throw new ParsingException('Failed to cast property $'.$property, $this->class, $data, $t);
+            }
         }
 
-        return new $this->class->name(...$processed);
+        try {
+            return new $this->class->name(...$processed);
+        } catch (\ArgumentCountError $t) {
+            throw $this->argumentCountError($data, $processed, $t);
+        } catch (\Throwable $t) {
+            throw new ParsingException('Instantiation failure.', $this->class, $data, $t);
+        }
     }
 
     protected function resolveCasters()
@@ -53,5 +64,32 @@ class DataParser implements Parser
         }
 
         return $casters;
+    }
+
+    protected function argumentCountError(array $data, array $processed, \ArgumentCountError $t): ParsingException
+    {
+        $expected = array_keys($this->class->getProperties());
+        $actual = array_keys($processed);
+
+        $message = [];
+        foreach ($expected as $argument) {
+            if (! in_array($argument, $actual)) {
+                $message[] = '--- : '.$argument;
+
+                continue;
+            }
+            $message[] = '    : '.$argument;
+        }
+
+        foreach (array_diff($actual, $expected) as $argument) {
+            $message[] = '+++ : '.$argument;
+        }
+
+        return new ParsingException(
+            'Failed to instantiate '.$this->class->getName().' with arguments '."\n".implode("\n", $message),
+            $this->class,
+            $data,
+            $t
+        );
     }
 }
