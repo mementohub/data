@@ -13,7 +13,6 @@ use Mementohub\Data\Casters\EnumCaster;
 use Mementohub\Data\Casters\GeneratorCaster;
 use Mementohub\Data\Casters\MultiCaster;
 use Mementohub\Data\Contracts\Caster;
-use Mementohub\Data\Data;
 use Mementohub\Data\Entities\DataProperty;
 use Traversable;
 
@@ -44,11 +43,20 @@ class CasterFactory
 
     protected function getDataCaster(): array
     {
-        if ($this->property->getType()->firstOf(Data::class)) {
+        if ($this->property->isData()) {
             return [new DataCaster($this->property)];
         }
 
-        return [];
+        if ($this->property->isEnum()
+            || $this->property->isTraversable()
+            || $this->property->isDateTime()
+            || $this->property->getType()->isBuiltin()
+        ) {
+            return [];
+        }
+
+        // regular objects
+        return [new DataCaster($this->property)];
     }
 
     /** @return Caster[] */

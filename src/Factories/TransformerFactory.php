@@ -63,7 +63,7 @@ class TransformerFactory
             return null;
         }
 
-        return null;
+        return self::for($property->getType()->getMainType());
     }
 
     public static function setExceptions(Data $source, array $except): void
@@ -91,6 +91,10 @@ class TransformerFactory
             return new DataTransformer($this->class);
         }
 
-        return null;
+        if ($this->class->isInternal()) {
+            return null;
+        }
+
+        return new DataTransformer($this->class);
     }
 }

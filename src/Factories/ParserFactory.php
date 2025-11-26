@@ -110,6 +110,7 @@ class ParserFactory
             return [new DataParser($this->class)];
         }
 
-        return [];
+        // regular objects
+        return [new DataParser($this->class)];
     }
 }
