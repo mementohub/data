@@ -17,7 +17,7 @@ trait Transformable
 
     public function toJson($options = 0): string
     {
-        return json_encode($this->transform(), $options);
+        return json_encode($this->toArray(), $options);
     }
 
     public function except(array|string ...$properties): static

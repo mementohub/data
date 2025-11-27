@@ -59,7 +59,7 @@ class DataType
     public function allows(string $type): bool
     {
         if ($this->type instanceof ReflectionNamedType) {
-            return $this->getName() === $type;
+            return $this->type->getName() === $type;
         }
 
         if ($this->type instanceof ReflectionUnionType) {

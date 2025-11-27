@@ -12,8 +12,6 @@ class GeneratorCaster implements Caster
 {
     protected readonly ?Parser $parser;
 
-    protected readonly ?string $type;
-
     public function __construct(
         protected readonly DataProperty $property,
         protected readonly ?string $class = null

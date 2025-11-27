@@ -11,6 +11,6 @@ trait Parsable
 
         return ParserFactory::for(static::class)
             ?->handle($payload)
-            ?? new static(...$payload);
+            ?? new static(...$payload); // @phpstan-ignore new.static
     }
 }
