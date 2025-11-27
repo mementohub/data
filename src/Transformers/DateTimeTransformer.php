@@ -16,7 +16,7 @@ class DateTimeTransformer implements Transformer
     ) {
         $this->format = $this->property
             ->getFirstAttributeInstance(DateTimeFormat::class)
-            ?->output
+            ->output
             ?? DATE_ATOM;
     }
 

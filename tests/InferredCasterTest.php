@@ -146,7 +146,6 @@ class InferredCasterTest extends TestCase
         ]);
 
         $this->assertInstanceOf(Album9129343::class, $album);
-        $this->assertIsArray($album->genres);
         $this->assertCount(2, $album->genres);
         $this->assertInstanceOf(Genre9129342::class, $album->genres[0]);
         $this->assertEquals('genre1', $album->genres[0]->value);
