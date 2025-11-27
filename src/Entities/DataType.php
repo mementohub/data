@@ -8,7 +8,8 @@ use ReflectionUnionType;
 use RuntimeException;
 
 /**
- * @mixin ReflectionType
+ * @mixin ReflectionNamedType
+ * @mixin ReflectionUnionType
  */
 class DataType
 {
@@ -31,14 +32,20 @@ class DataType
         return null;
     }
 
-    /** @return ReflectionNamedType[] */
+    /**
+     * @return array<int, ReflectionNamedType>
+     */
     public function getTypes(): array
     {
         if ($this->type instanceof ReflectionUnionType) {
+            /** @var array<int, ReflectionNamedType> */
             return $this->type->getTypes();
         }
 
-        return [$this->type];
+        /** @var ReflectionNamedType $type */
+        $type = $this->type;
+
+        return [$type];
     }
 
     public function getMainType(): string
