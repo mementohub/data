@@ -44,12 +44,12 @@ class ParserFactory
 
     protected function resolve(): ?Parser
     {
-        $parsers = array_filter([
+        $parsers = [
             ...$this->resolveNormalizers(),
             ...$this->resolveInputMapper(),
             ...$this->resolveStrippingValues(),
             ...$this->resolveParsers(),
-        ]);
+        ];
 
         return match (count($parsers)) {
             0 => null,
