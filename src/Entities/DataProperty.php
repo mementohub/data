@@ -6,6 +6,7 @@ use BackedEnum;
 use DateTimeInterface;
 use Mementohub\Data\Data;
 use Mementohub\Data\Values\Optional;
+use phpDocumentor\Reflection\DocBlock\Tags\TagWithType;
 use phpDocumentor\Reflection\DocBlockFactory;
 use phpDocumentor\Reflection\Types\AbstractList;
 use phpDocumentor\Reflection\Types\Array_;
@@ -63,8 +64,11 @@ class DataProperty
         $factory = DocBlockFactory::createInstance();
         $docblock = $factory->create($this->property->getDocComment());
 
-        /** @var \phpDocumentor\Reflection\DocBlock\Tag $tag */
         foreach ($docblock->getTagsByName('var') as $tag) {
+            if (! $tag instanceof TagWithType) {
+                continue;
+            }
+
             $type = $tag->getType();
 
             // Support both Array_ (e.g., Dto[]) and Collection (e.g., Collection<int, Dto>)

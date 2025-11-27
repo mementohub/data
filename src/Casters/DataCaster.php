@@ -25,7 +25,7 @@ class DataCaster implements Caster
         }
 
         try {
-            return $this->parser->handle($value, $context);
+            return $this->parser->handle($value);
         } catch (\Throwable $t) {
             throw new CastingException('Unable to parse data property', $this->property, $value, $t);
         }

@@ -139,7 +139,7 @@ class Owner87123Lazy extends Data
 class Owner87123Generator extends Data
 {
     public function __construct(
-        /** @var Pet87123[] */
+        /** @var Generator<int, Pet87123> */
         public readonly Generator $pets
     ) {}
 }
