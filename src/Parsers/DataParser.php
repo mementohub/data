@@ -2,6 +2,7 @@
 
 namespace Mementohub\Data\Parsers;
 
+use Mementohub\Data\Contracts\Caster;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
 use Mementohub\Data\Exceptions\ParsingException;
@@ -9,7 +10,7 @@ use Mementohub\Data\Factories\CasterFactory;
 
 class DataParser implements Parser
 {
-    /** @var array<string, Caster> */
+    /** @var array<string, Caster|null> */
     protected readonly array $casters;
 
     public function __construct(
@@ -18,15 +19,15 @@ class DataParser implements Parser
         $this->casters = $this->resolveCasters();
     }
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
-        if (! is_array($data)) {
-            return $data;
+        if (! is_array($value)) {
+            return $value;
         }
 
         $processed = [];
         foreach ($this->casters as $property => $caster) {
-            if (! array_key_exists($property, $data)) {
+            if (! array_key_exists($property, $value)) {
                 if (array_key_exists($property, $this->class->defaults)) {
                     $processed[$property] = $this->class->defaults[$property];
                 }
@@ -35,24 +36,24 @@ class DataParser implements Parser
             }
 
             if (is_null($caster)) {
-                $processed[$property] = $data[$property];
+                $processed[$property] = $value[$property];
 
                 continue;
             }
 
             try {
-                $processed[$property] = $caster->handle($data[$property], $data);
+                $processed[$property] = $caster->handle($value[$property], $value);
             } catch (\Throwable $t) {
-                throw new ParsingException('Failed to cast property $'.$property, $this->class, $data, $t);
+                throw new ParsingException('Failed to cast property $'.$property, $this->class, $value, $t);
             }
         }
 
         try {
             return new $this->class->name(...$processed);
         } catch (\ArgumentCountError $t) {
-            throw $this->argumentCountError($data, $processed, $t);
+            throw $this->argumentCountError($value, $processed, $t);
         } catch (\Throwable $t) {
-            throw new ParsingException('Instantiation failure.', $this->class, $data, $t);
+            throw new ParsingException('Instantiation failure.', $this->class, $value, $t);
         }
     }
 

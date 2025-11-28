@@ -4,5 +4,5 @@ namespace Mementohub\Data\Contracts;
 
 interface Transformer
 {
-    public function handle(mixed $data): mixed;
+    public function handle(mixed $value): mixed;
 }

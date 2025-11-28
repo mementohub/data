@@ -4,5 +4,5 @@ namespace Mementohub\Data\Contracts;
 
 interface Parser
 {
-    public function handle(mixed $payload): mixed;
+    public function handle(mixed $value): mixed;
 }

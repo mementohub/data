@@ -13,12 +13,12 @@ class MultiParser implements Parser
         protected readonly array $parsers
     ) {}
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
         foreach ($this->parsers as $parser) {
-            $data = $parser->handle($data);
+            $value = $parser->handle($value);
         }
 
-        return $data;
+        return $value;
     }
 }

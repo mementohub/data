@@ -22,16 +22,16 @@ class InputMappingParser implements Parser
         $this->has_nested_mappers = $this->detectNestedMappers();
     }
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
-        if (! is_array($data)) {
-            return $data;
+        if (! is_array($value)) {
+            return $value;
         }
 
         try {
-            return $this->mapInput($data);
+            return $this->mapInput($value);
         } catch (\Throwable $t) {
-            throw new ParsingException('Failed to map input for these mappers:'.print_r($this->mappers, true), $this->class, $data, $t);
+            throw new ParsingException('Failed to map input for these mappers:'.print_r($this->mappers, true), $this->class, $value, $t);
         }
     }
 

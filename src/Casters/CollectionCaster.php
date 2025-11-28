@@ -44,7 +44,7 @@ class CollectionCaster implements Caster
         try {
             $collection = [];
             foreach ($value as $key => $item) {
-                $collection[$key] = $this->parser->handle($item, $context);
+                $collection[$key] = $this->parser->handle($item);
             }
         } catch (\Throwable $t) {
             throw new CastingException('Unable to parse item '.$key.' in collection', $this->property, $value, $t);

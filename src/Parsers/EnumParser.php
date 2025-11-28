@@ -14,16 +14,16 @@ class EnumParser implements Parser
         public readonly DataClass $class
     ) {}
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
-        if (is_string($data) || is_int($data)) {
+        if (is_string($value) || is_int($value)) {
             try {
-                return $this->cached[$data] ??= $this->class->name::from($data);
+                return $this->cached[$value] ??= $this->class->name::from($value);
             } catch (\Throwable $t) {
-                throw new ParsingException('Unable to create '.$this->class->name.' from '.$data, $this->class, $data, $t);
+                throw new ParsingException('Unable to create '.$this->class->name.' from '.$value, $this->class, $value, $t);
             }
         }
 
-        return $data;
+        return $value;
     }
 }

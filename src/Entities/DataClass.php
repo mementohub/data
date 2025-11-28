@@ -6,7 +6,7 @@ use Mementohub\Data\Values\Optional;
 use ReflectionClass;
 
 /**
- * @mixin ReflectionClass;
+ * @mixin ReflectionClass
  */
 class DataClass
 {

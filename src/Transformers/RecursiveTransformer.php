@@ -13,9 +13,9 @@ class RecursiveTransformer implements Transformer
         protected readonly string $class,
     ) {}
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
-        return $this->transformer()?->handle($data);
+        return $this->transformer()?->handle($value);
     }
 
     protected function transformer(): ?Transformer

@@ -123,7 +123,7 @@ class Owner87123 extends Data
 class Owner87123Collection extends Data
 {
     public function __construct(
-        /** @var Pet87123[] */
+        /** @var Collection<int, Pet87123> */
         public readonly Collection $pets
     ) {}
 }
@@ -131,7 +131,7 @@ class Owner87123Collection extends Data
 class Owner87123Lazy extends Data
 {
     public function __construct(
-        /** @var Pet87123[] */
+        /** @var LazyCollection<string, Pet87123> */
         public readonly LazyCollection $pets
     ) {}
 }
@@ -139,7 +139,7 @@ class Owner87123Lazy extends Data
 class Owner87123Generator extends Data
 {
     public function __construct(
-        /** @var Pet87123[] */
+        /** @var Generator<int, Pet87123> */
         public readonly Generator $pets
     ) {}
 }

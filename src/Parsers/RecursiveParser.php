@@ -13,9 +13,9 @@ class RecursiveParser implements Parser
         protected readonly string $class,
     ) {}
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
-        return $this->parser()?->handle($data);
+        return $this->parser()?->handle($value);
     }
 
     protected function parser(): ?Parser

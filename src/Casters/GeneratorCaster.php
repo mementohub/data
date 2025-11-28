@@ -12,8 +12,6 @@ class GeneratorCaster implements Caster
 {
     protected readonly ?Parser $parser;
 
-    protected readonly ?string $type;
-
     public function __construct(
         protected readonly DataProperty $property,
         protected readonly ?string $class = null
@@ -33,7 +31,7 @@ class GeneratorCaster implements Caster
 
         foreach ($value as $key => $item) {
             try {
-                yield $key => $this->parser->handle($item, $context);
+                yield $key => $this->parser->handle($item);
             } catch (\Throwable $t) {
                 throw new CastingException('Unable to parse item '.$key.' in generator', $this->property, $item, $t);
             }

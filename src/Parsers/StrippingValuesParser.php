@@ -17,16 +17,16 @@ class StrippingValuesParser implements Parser
         $this->strippers = $this->resolveStrippers();
     }
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
-        if (! is_array($data)) {
-            return $data;
+        if (! is_array($value)) {
+            return $value;
         }
 
         try {
-            return $this->stripInput($data);
+            return $this->stripInput($value);
         } catch (\Throwable $t) {
-            throw new ParsingException('Failed to strip values for these strippers:'.print_r($this->strippers, true), $this->class, $data, $t);
+            throw new ParsingException('Failed to strip values for these strippers:'.print_r($this->strippers, true), $this->class, $value, $t);
         }
     }
 

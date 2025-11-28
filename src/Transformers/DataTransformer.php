@@ -28,32 +28,32 @@ class DataTransformer implements Transformer
             && ! count($this->except);
     }
 
-    public function handle(mixed $data): mixed
+    public function handle(mixed $value): mixed
     {
-        if (is_null($data)) {
+        if (is_null($value)) {
             return null;
         }
 
         if ($this->doesntNeedTransformation) {
-            return (array) $data;
+            return (array) $value;
         }
 
         $transformed = [];
         foreach ($this->transformers as $property => $transformer) {
-            if ($this->hasOptionals && ($data->$property instanceof Optional)) {
+            if ($this->hasOptionals && ($value->$property instanceof Optional)) {
                 continue;
             }
 
             if ($transformer === null) {
-                $transformed[$property] = $data->$property;
+                $transformed[$property] = $value->$property;
 
                 continue;
             }
 
             try {
-                $transformed[$property] = $transformer->handle($data->$property);
+                $transformed[$property] = $transformer->handle($value->$property);
             } catch (\Throwable $t) {
-                throw new TransformingException('Failed to transform property '."\n".$property, $data, $t);
+                throw new TransformingException('Failed to transform property '."\n".$property, $value, $t);
             }
         }
 

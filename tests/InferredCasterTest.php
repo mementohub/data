@@ -146,7 +146,6 @@ class InferredCasterTest extends TestCase
         ]);
 
         $this->assertInstanceOf(Album9129343::class, $album);
-        $this->assertIsArray($album->genres);
         $this->assertCount(2, $album->genres);
         $this->assertInstanceOf(Genre9129342::class, $album->genres[0]);
         $this->assertEquals('genre1', $album->genres[0]->value);
@@ -187,7 +186,7 @@ class Album2318 extends Data
     public function __construct(
         public readonly string $name,
         public readonly ?string $author,
-        /** @var Genre2318[] */
+        /** @var Collection<Genre2318> */
         public readonly Collection $genres,
     ) {}
 }
@@ -205,7 +204,7 @@ class Album9129342 extends Data
     public function __construct(
         public readonly string $name,
         public readonly ?string $author,
-        /** @var Genre9129342[] */
+        /** @var Collection<int, Genre9129342> */
         public readonly Collection $genres,
     ) {}
 }
@@ -239,7 +238,7 @@ class Father79823 extends Data
 {
     public function __construct(
         public readonly string $name,
-        /** @var Child[] */
+        /** @var Collection<int, Child> */
         public readonly Collection $children,
     ) {}
 }
@@ -248,7 +247,7 @@ class Person81313 extends Data
 {
     public function __construct(
         public readonly string $name,
-        /** @var PersonAlias[] */
+        /** @var Collection<PersonAlias> */
         public readonly Collection $friends,
     ) {}
 }
