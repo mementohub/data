@@ -59,6 +59,14 @@ class TransformerFactory
             return self::for($property->getType()->firstOf(Data::class));
         }
 
+        if ($property->allowsOptional()) {
+            if ($property->getType()->isBuiltinExcludingOptional()) {
+                return null;
+            }
+
+            return self::for($property->getType()->getMainTypeExcludingOptional());
+        }
+
         if ($property->getType()->isBuiltin()) {
             return null;
         }

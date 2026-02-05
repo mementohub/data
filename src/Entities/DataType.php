@@ -2,6 +2,7 @@
 
 namespace Mementohub\Data\Entities;
 
+use Mementohub\Data\Values\Optional;
 use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
@@ -56,7 +57,7 @@ class DataType
 
         if ($this->type instanceof ReflectionUnionType) {
             foreach ($this->type->getTypes() as $type) {
-                return $type;
+                return $type->getName();
             }
         }
 
@@ -89,6 +90,40 @@ class DataType
         }
 
         return true;
+    }
+
+    public function isBuiltinExcludingOptional(): bool
+    {
+        foreach ($this->getTypes() as $type) {
+            if ($type->getName() === Optional::class) {
+                continue;
+            }
+
+            if (! $type->isBuiltin()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function getMainTypeExcludingOptional(): string
+    {
+        if ($this->type instanceof ReflectionNamedType) {
+            return $this->type->getName();
+        }
+
+        if ($this->type instanceof ReflectionUnionType) {
+            foreach ($this->type->getTypes() as $type) {
+                if ($type->getName() === Optional::class) {
+                    continue;
+                }
+
+                return $type->getName();
+            }
+        }
+
+        throw new RuntimeException('Unable to find main type');
     }
 
     public function __call($name, $arguments)

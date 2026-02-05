@@ -93,6 +93,19 @@ class TransformerTest extends TestCase
         ], $person->toArray());
     }
 
+    public function test_it_transforms_dto_with_optional_property()
+    {
+        $person = PersonWithOptionalAge98141::from([
+            'name' => 'John',
+            'age' => 30,
+        ]);
+
+        $this->assertEquals([
+            'name' => 'John',
+            'age' => 30,
+        ], $person->toArray());
+    }
+
     public function test_it_transforms_except()
     {
         $person = PersonWithChildren98141::from([
