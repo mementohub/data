@@ -23,8 +23,12 @@ class TransformerFactory
 
     protected DataClass $class;
 
-    public static function for(string $class): ?Transformer
+    public static function for(?string $class): ?Transformer
     {
+        if (is_null($class) || ! class_exists($class)) {
+            return null;
+        }
+
         if (array_key_exists($class, static::$resolving)) {
             return new RecursiveTransformer($class);
         }
