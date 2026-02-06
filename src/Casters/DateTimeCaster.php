@@ -19,7 +19,7 @@ class DateTimeCaster implements Caster
         protected ?string $format = null,
         protected readonly bool $cacheable = true
     ) {
-        $this->type = $this->property->getType()->getMainType();
+        $this->type = $this->resolveType();
 
         if (! $this->format) {
             $this->format = $this->property->getFirstAttributeInstance(DateTimeFormat::class)?->input;

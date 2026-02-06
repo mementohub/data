@@ -2,11 +2,11 @@
 
 namespace Mementohub\Data\Entities;
 
+use Mementohub\Data\Data;
 use Mementohub\Data\Values\Optional;
 use ReflectionNamedType;
 use ReflectionType;
 use ReflectionUnionType;
-use RuntimeException;
 
 /**
  * @mixin ReflectionNamedType
@@ -15,18 +15,14 @@ use RuntimeException;
 class DataType
 {
     public function __construct(
-        protected readonly ReflectionType $type
+        protected readonly ?ReflectionType $type
     ) {}
 
     public function firstOf(string $abstract): ?string
     {
         foreach ($this->getTypes() as $type) {
-            $name = $type->getName();
-            if ($name === $abstract) {
-                return $name;
-            }
-            if (is_a($name, $abstract, true)) {
-                return $name;
+            if ($this->is($type, $abstract)) {
+                return $type->getName();
             }
         }
 
@@ -43,38 +39,37 @@ class DataType
             return $this->type->getTypes();
         }
 
-        /** @var ReflectionNamedType $type */
-        $type = $this->type;
+        if ($this->type instanceof ReflectionNamedType) {
+            return [$this->type];
+        }
 
-        return [$type];
+        return [];
     }
 
-    public function getMainType(): string
+    public function getMainType(): ?string
     {
-        if ($this->type instanceof ReflectionNamedType) {
-            return $this->type->getName();
+        [$candidates, $optionals] = $this->partition($this->getTypes(), fn (ReflectionNamedType $type) => $type->getName() !== Optional::class);
+
+        [$data, $others] = $this->partition($candidates, fn (ReflectionNamedType $type) => $this->is($type, Data::class));
+
+        if (array_key_exists(0, $data)) {
+            return $data[0]->getName();
         }
 
-        if ($this->type instanceof ReflectionUnionType) {
-            foreach ($this->type->getTypes() as $type) {
-                return $type->getName();
-            }
+        [$custom, $others] = $this->partition($others, fn (ReflectionNamedType $type) => ! $type->isBuiltin());
+
+        if (array_key_exists(0, $custom)) {
+            return $custom[0]->getName();
         }
 
-        throw new RuntimeException('Unable to find main type');
+        return null;
     }
 
-    public function allows(string $type): bool
+    public function allows(string $abstract): bool
     {
-        if ($this->type instanceof ReflectionNamedType) {
-            return $this->type->getName() === $type;
-        }
-
-        if ($this->type instanceof ReflectionUnionType) {
-            foreach ($this->type->getTypes() as $namedType) {
-                if ($namedType->getName() === $type) {
-                    return true;
-                }
+        foreach ($this->getTypes() as $type) {
+            if ($this->is($type, $abstract)) {
+                return true;
             }
         }
 
@@ -92,38 +87,34 @@ class DataType
         return true;
     }
 
-    public function isBuiltinExcludingOptional(): bool
+    public function is(ReflectionNamedType $type, string $abstract): bool
     {
-        foreach ($this->getTypes() as $type) {
-            if ($type->getName() === Optional::class) {
-                continue;
-            }
+        $name = $type->getName();
 
-            if (! $type->isBuiltin()) {
-                return false;
-            }
+        if ($name === $abstract) {
+            return true;
+        }
+        if (is_a($name, $abstract, true)) {
+            return true;
         }
 
-        return true;
+        return false;
     }
 
-    public function getMainTypeExcludingOptional(): string
+    protected function partition(array $array, callable $callback): array
     {
-        if ($this->type instanceof ReflectionNamedType) {
-            return $this->type->getName();
-        }
+        $matched = [];
+        $unmatched = [];
 
-        if ($this->type instanceof ReflectionUnionType) {
-            foreach ($this->type->getTypes() as $type) {
-                if ($type->getName() === Optional::class) {
-                    continue;
-                }
-
-                return $type->getName();
+        foreach ($array as $item) {
+            if ($callback($item)) {
+                $matched[] = $item;
+            } else {
+                $unmatched[] = $item;
             }
         }
 
-        throw new RuntimeException('Unable to find main type');
+        return [$matched, $unmatched];
     }
 
     public function __call($name, $arguments)

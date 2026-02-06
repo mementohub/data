@@ -106,6 +106,25 @@ class TransformerTest extends TestCase
         ], $person->toArray());
     }
 
+    public function test_it_transforms_dto_with_optional_child()
+    {
+        $person = PersonWithOptionalChild98141::from([
+            'name' => 'John',
+            'child' => [
+                'name' => 'Jimmy',
+                'age' => 5,
+            ],
+        ]);
+
+        $this->assertEquals([
+            'name' => 'John',
+            'child' => [
+                'name' => 'Jimmy',
+                'age' => 5,
+            ],
+        ], $person->toArray());
+    }
+
     public function test_it_transforms_except()
     {
         $person = PersonWithChildren98141::from([
@@ -176,6 +195,14 @@ class PersonWithOptionalAge98141 extends Data
     public function __construct(
         public readonly string $name,
         public readonly Optional|int $age,
+    ) {}
+}
+
+class PersonWithOptionalChild98141 extends Data
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly Optional|Child98141 $child,
     ) {}
 }
 

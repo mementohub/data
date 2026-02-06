@@ -23,11 +23,16 @@ class ParserFactory
 
     protected DataClass $class;
 
-    public static function for(string $class): ?Parser
+    public static function for(?string $class): ?Parser
     {
+        if (is_null($class) || ! class_exists($class)) {
+            return null;
+        }
+
         if (array_key_exists($class, static::$resolving)) {
             return new RecursiveParser($class);
         }
+
         static::$resolving[$class] = true;
 
         $resolved = static::$resolved[$class] ??= new self($class)->resolve();

@@ -59,19 +59,17 @@ class TransformerFactory
             return self::for($property->getType()->firstOf(Data::class));
         }
 
-        if ($property->allowsOptional()) {
-            if ($property->getType()->isBuiltinExcludingOptional()) {
-                return null;
-            }
-
-            return self::for($property->getType()->getMainTypeExcludingOptional());
-        }
-
         if ($property->getType()->isBuiltin()) {
             return null;
         }
 
-        return self::for($property->getType()->getMainType());
+        $type = $property->getType()->getMainType();
+
+        if ($type === null) {
+            return null;
+        }
+
+        return self::for($type);
     }
 
     public static function setExceptions(Data $source, array $except): void
