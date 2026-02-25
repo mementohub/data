@@ -47,7 +47,7 @@ class InputMappingParser implements Parser
     protected function mapSimpleInput(array $data): array
     {
         foreach ($this->mappers as $from => $to) {
-            $data[$to] = $data[$from];
+            $data[$to] = $data[$from] ?? null;
         }
 
         return $data;

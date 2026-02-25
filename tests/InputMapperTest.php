@@ -22,6 +22,32 @@ class InputMapperTest extends TestCase
         $this->assertEquals(30, $person->age);
     }
 
+    public function test_it_maps_input_when_mapped_key_is_missing()
+    {
+        $person = InputMaping31423::from([
+            'email' => 'john@example.com',
+            'age' => 30,
+        ]);
+
+        $this->assertInstanceOf(InputMaping31423::class, $person);
+        $this->assertNull($person->name);
+        $this->assertEquals('john@example.com', $person->email);
+        $this->assertEquals(30, $person->age);
+    }
+
+    public function test_it_maps_nested_input_when_mapped_key_is_missing()
+    {
+        $person = InputMaping31424::from([
+            'email' => 'john@example.com',
+            'age' => 30,
+        ]);
+
+        $this->assertInstanceOf(InputMaping31424::class, $person);
+        $this->assertNull($person->name);
+        $this->assertEquals('john@example.com', $person->email);
+        $this->assertEquals(30, $person->age);
+    }
+
     public function test_it_maps_input_with_nested_properties()
     {
         $person = InputMaping31422::from([
@@ -49,6 +75,26 @@ class InputMaping31421 extends Data
     public function __construct(
         #[MapInputName('nume')]
         public readonly string $name,
+        public readonly ?string $email,
+        public readonly int $age = 30,
+    ) {}
+}
+
+class InputMaping31423 extends Data
+{
+    public function __construct(
+        #[MapInputName('nume')]
+        public readonly ?string $name,
+        public readonly ?string $email,
+        public readonly int $age = 30,
+    ) {}
+}
+
+class InputMaping31424 extends Data
+{
+    public function __construct(
+        #[MapInputName('some.deep.nested.property')]
+        public readonly ?string $name,
         public readonly ?string $email,
         public readonly int $age = 30,
     ) {}
