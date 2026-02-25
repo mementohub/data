@@ -6,6 +6,7 @@ use Mementohub\Data\Attributes\MapInputName;
 use Mementohub\Data\Contracts\Parser;
 use Mementohub\Data\Entities\DataClass;
 use Mementohub\Data\Exceptions\ParsingException;
+use Mementohub\Data\Values\MissingValue;
 
 class InputMappingParser implements Parser
 {
@@ -15,11 +16,14 @@ class InputMappingParser implements Parser
 
     protected readonly bool $has_nested_mappers;
 
+    protected readonly MissingValue $missing_value;
+
     public function __construct(
         public readonly DataClass $class
     ) {
         $this->mappers = $this->resolveInputMappers();
         $this->has_nested_mappers = $this->detectNestedMappers();
+        $this->missing_value = new MissingValue;
     }
 
     public function handle(mixed $value): mixed
@@ -47,7 +51,10 @@ class InputMappingParser implements Parser
     protected function mapSimpleInput(array $data): array
     {
         foreach ($this->mappers as $from => $to) {
-            $data[$to] = $data[$from] ?? null;
+            if (! array_key_exists($from, $data)) {
+                continue;
+            }
+            $data[$to] = $data[$from];
         }
 
         return $data;
@@ -56,7 +63,11 @@ class InputMappingParser implements Parser
     protected function mapNestedInput(array $data): array
     {
         foreach ($this->mappers as $from => $to) {
-            $data[$to] = $this->getNestedValue($data, explode('.', $from));
+            $value = $this->getNestedValue($data, explode('.', $from));
+            if ($value instanceof MissingValue) {
+                continue;
+            }
+            $data[$to] = $value;
         }
 
         return $data;
@@ -67,7 +78,7 @@ class InputMappingParser implements Parser
         $key = array_shift($path);
 
         if (! array_key_exists($key, $data)) {
-            return null;
+            return $this->missing_value;
         }
 
         $value = $data[$key];
@@ -80,7 +91,7 @@ class InputMappingParser implements Parser
             return $this->getNestedValue($value, $path);
         }
 
-        return null;
+        return $this->missing_value;
     }
 
     protected function resolveInputMappers(): array
