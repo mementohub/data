@@ -3,9 +3,7 @@
 namespace Mementohub\Data\Traits;
 
 use Mementohub\Data\Contracts\Transformer;
-use Mementohub\Data\Entities\DataClass;
 use Mementohub\Data\Factories\TransformerFactory;
-use Mementohub\Data\Transformers\DataTransformer;
 
 trait Transformable
 {
@@ -29,13 +27,10 @@ trait Transformable
 
     protected function transformer(): ?Transformer
     {
-        if ($exceptions = TransformerFactory::getExceptions($this)) {
-            return new DataTransformer(
-                new DataClass($this::class),
-                $exceptions
-            );
-        }
 
-        return TransformerFactory::for($this::class);
+        return TransformerFactory::for(
+            $this::class,
+            TransformerFactory::getExceptions($this)
+        );
     }
 }

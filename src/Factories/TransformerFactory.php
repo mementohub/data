@@ -2,6 +2,7 @@
 
 namespace Mementohub\Data\Factories;
 
+use Mementohub\Data\Attributes\MapOutputName;
 use Mementohub\Data\Attributes\TransformUsing;
 use Mementohub\Data\Contracts\Transformer;
 use Mementohub\Data\Data;
@@ -11,6 +12,8 @@ use Mementohub\Data\Transformers\CollectionTransformer;
 use Mementohub\Data\Transformers\DataTransformer;
 use Mementohub\Data\Transformers\DateTimeTransformer;
 use Mementohub\Data\Transformers\EnumTransformer;
+use Mementohub\Data\Transformers\MultiTransformer;
+use Mementohub\Data\Transformers\OutputMappingTransformer;
 use Mementohub\Data\Transformers\RecursiveTransformer;
 
 class TransformerFactory
@@ -23,7 +26,9 @@ class TransformerFactory
 
     protected DataClass $class;
 
-    public static function for(?string $class): ?Transformer
+    protected readonly array $except;
+
+    public static function for(?string $class, array $except = []): ?Transformer
     {
         if (is_null($class) || ! class_exists($class)) {
             return null;
@@ -34,7 +39,11 @@ class TransformerFactory
         }
         static::$resolving[$class] = true;
 
-        $resolved = static::$resolved[$class] ??= new self($class)->resolve();
+        if (count($except) > 0) {
+            $resolved = new self($class, $except)->resolve();
+        } else {
+            $resolved = static::$resolved[$class] ??= new self($class)->resolve();
+        }
 
         unset(static::$resolving[$class]);
 
@@ -80,9 +89,10 @@ class TransformerFactory
         return static::$exceptions[spl_object_id($source)] ?? [];
     }
 
-    public function __construct(string $class)
+    public function __construct(string $class, array $except = [])
     {
         $this->class = new DataClass($class);
+        $this->except = $except;
     }
 
     protected function resolve(): ?Transformer
@@ -91,14 +101,35 @@ class TransformerFactory
             return new EnumTransformer;
         }
 
-        if ($this->class->isSubclassOf(Data::class)) {
-            return new DataTransformer($this->class);
-        }
-
         if ($this->class->isInternal()) {
             return null;
         }
 
-        return new DataTransformer($this->class);
+        $transformers = [
+            ...$this->resolveTransformers(),
+            ...$this->resolveOutputMapper(),
+        ];
+
+        return match (count($transformers)) {
+            0 => null,
+            1 => $transformers[0],
+            default => new MultiTransformer($transformers),
+        };
+    }
+
+    /** @return Transformer[] */
+    protected function resolveTransformers(): array
+    {
+        return [new DataTransformer($this->class, $this->except)];
+    }
+
+    /** @return Transformer[] */
+    protected function resolveOutputMapper(): array
+    {
+        if (! $this->class->hasAttribute(MapOutputName::class)) {
+            return [];
+        }
+
+        return [new OutputMappingTransformer($this->class)];
     }
 }

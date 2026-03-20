@@ -74,6 +74,36 @@ To transform a data class to an array, use the `toArray` method.
 $array = $user->toArray();
 ```
 
+You can customize serialized keys with `MapOutputName`.
+
+```php
+<?php
+
+namespace App\Data;
+
+use Mementohub\Data\Attributes\MapOutputName;
+use Mementohub\Data\Data;
+
+class User extends Data
+{
+    public function __construct(
+        #[MapOutputName('full_name')]
+        public readonly string $name,
+        #[MapOutputName('contact_email')]
+        public readonly string $email,
+    ) {}
+}
+
+$array = User::from([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+])->toArray();
+
+// ['full_name' => 'John Doe', 'contact_email' => 'john@example.com']
+```
+
+`MapOutputName` only remaps top-level serialized keys. It does not create nested output paths.
+
 
 ## Inspiration
 
