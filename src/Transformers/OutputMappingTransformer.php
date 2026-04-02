@@ -32,16 +32,19 @@ class OutputMappingTransformer implements Transformer
 
     protected function mapOutput(array $data): array
     {
-        foreach ($this->mappers as $from => $to) {
-            if (! array_key_exists($from, $data) || $from === $to) {
+        $output = [];
+
+        foreach ($data as $key => $value) {
+            if (array_key_exists($key, $this->mappers)) {
+                $output[$this->mappers[$key]] = $value;
+
                 continue;
             }
 
-            $data[$to] = $data[$from];
-            unset($data[$from]);
+            $output[$key] = $value;
         }
 
-        return $data;
+        return $output;
     }
 
     protected function resolveOutputMappers(): array
